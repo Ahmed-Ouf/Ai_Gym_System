@@ -1,0 +1,49 @@
+<div class="sidebar-wrapper" [class.collapsed]="collapsed" [class.mobile-active]="mobileActive">
+  <!-- Close Button for Mobile Overlay -->
+  <button class="mobile-close-btn lg:hidden" (click)="onMobileClose()" title="إغلاق القائمة">
+    <i class="pi pi-times"></i>
+  </button>
+
+  <!-- Gym Brand Area -->
+  <div class="brand-section">
+    <div class="logo-sphere">
+      <i class="pi pi-bolt logo-icon"></i>
+    </div>
+    <div class="brand-details" *ngIf="!collapsed">
+      <span class="brand-name">جيم الحلواني</span>
+      <span class="brand-tagline text-xs font-semibold">EL-HALAWANY GYM</span>
+    </div>
+  </div>
+
+  <hr class="nav-divider" />
+
+  <!-- Navigation Menu List -->
+  <nav class="nav-menu">
+    <ul>
+      <li *ngFor="let item of navItems" class="nav-item">
+        <a [routerLink]="[item.route]" 
+           routerLinkActive="active-route" 
+           (click)="onMobileClose()"
+           class="nav-link"
+           [title]="collapsed ? item.label : ''">
+          <div class="link-icon-container">
+            <i [class]="item.icon"></i>
+          </div>
+          <span class="link-label" *ngIf="!collapsed">{{ item.label }}</span>
+          <span class="active-indicator" *ngIf="!collapsed"></span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Gym Footer details -->
+  <div class="sidebar-footer" *ngIf="!collapsed">
+    <div class="status-indicator">
+      <span class="pulse-dot"></span>
+      <span class="status-txt">النظام متصل ونشط</span>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Dimmed Background Overlay -->
+<div class="sidebar-overlay lg:hidden" *ngIf="mobileActive" (click)="onMobileClose()"></div>

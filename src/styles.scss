@@ -1,0 +1,264 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
+
+/* PrimeNG Theme and Core Styling */
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.min.css";
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+/* Global Variable Declarations & Custom Variables */
+:root {
+  --font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  --secondary-gradient: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  --accent-color: #06b6d4;
+  --accent-purple: #7c3aed;
+  --bg-color: #f1f5f9;
+  --card-bg: #ffffff;
+  --card-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+  --hover-shadow: 0 20px 35px -5px rgba(37, 99, 235, 0.12), 0 8px 20px -2px rgba(37, 99, 235, 0.06);
+  --border-radius: 16px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset and Global Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  direction: rtl;
+  text-align: right;
+  font-family: var(--font-family) !important;
+  background-color: var(--bg-color);
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Typography Extensions */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: normal;
+  font-family: var(--font-family) !important;
+}
+
+/* Premium Styling Helper Classes */
+.gym-card {
+  background: #ffffff;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.gym-card:hover {
+  border-color: rgba(37, 99, 235, 0.25);
+  box-shadow: var(--hover-shadow);
+}
+
+/* Gradient Badge */
+.gradient-badge {
+  background: var(--primary-gradient);
+  color: white;
+  border-radius: 9999px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.status-badge.active {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.status-badge.expiring {
+  background-color: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.status-badge.expired {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.status-badge.upcoming {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
+}
+
+.status-badge.in-gym {
+  background-color: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #5eead4;
+}
+
+/* Interactive elements */
+.ripple-btn {
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.ripple-btn:active {
+  transform: scale(0.98);
+}
+
+/* Custom primeNG overrides for Cairo and RTL */
+.p-component {
+  font-family: var(--font-family) !important;
+}
+
+.p-card {
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow) !important;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.p-dialog {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  direction: rtl;
+  text-align: right;
+  .p-dialog-header {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.25rem 1.5rem;
+    font-weight: 700;
+  }
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+  .p-dialog-footer {
+    border-top: 1px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+  }
+}
+
+.p-inputtext {
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  font-family: var(--font-family) !important;
+  transition: var(--transition);
+  text-align: right;
+  &:enabled:hover {
+    border-color: #94a3b8;
+  }
+  &:enabled:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+}
+
+.p-dropdown {
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-family: var(--font-family) !important;
+  transition: var(--transition);
+  text-align: right;
+  &:not(.p-disabled):hover {
+    border-color: #94a3b8;
+  }
+  &:not(.p-disabled).p-focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+  .p-dropdown-label {
+    text-align: right;
+  }
+}
+
+.p-button {
+  border-radius: 10px;
+  padding: 0.7rem 1.4rem;
+  font-weight: 600;
+  font-family: var(--font-family) !important;
+  transition: var(--transition);
+  gap: 0.5rem;
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
+  }
+}
+
+.p-datatable {
+  direction: rtl;
+  text-align: right;
+  .p-datatable-thead > tr > th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 1rem 1.25rem;
+    text-align: right;
+  }
+  .p-datatable-tbody > tr {
+    transition: var(--transition);
+    &:hover {
+      background: #f8fafc !important;
+    }
+    > td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #f1f5f9;
+      text-align: right;
+    }
+  }
+  .p-paginator {
+    direction: ltr; // paginator controls
+    justify-content: center;
+    border: none;
+    padding: 1rem;
+  }
+}
+
+/* RTL Helpers */
+.rtl-flip {
+  transform: scaleX(-1);
+}

@@ -1,0 +1,71 @@
+<div class="payments-page-container" style="direction: rtl; text-align: right;">
+  <div class="page-header mb-4 flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-3">
+    <div>
+      <h1 class="text-3xl font-extrabold text-900 m-0">سجل الإيرادات والمدفوعات</h1>
+      <p class="text-sm text-600 m-0 mt-1">عرض وتدقيق المعاملات المالية وفواتير المشتركين.</p>
+    </div>
+    <div>
+      <button (click)="goToSubscriptions()" class="p-button p-button-primary">
+        <i class="pi pi-ticket mr-1"></i>
+        <span>إدارة الاشتراكات والتحصيل</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="gym-card mb-4 py-3 px-4 flex flex-column sm:flex-row justify-content-between align-items-center gap-3">
+    <div class="p-inputgroup max-w-28rem w-full">
+      <span class="p-inputgroup-addon bg-white border-left-none">
+        <i class="pi pi-search text-500"></i>
+      </span>
+      <input 
+        type="text" 
+        pInputText 
+        placeholder="ابحث بالاسم، الهاتف، أو رقم الإيصال..." 
+        [(ngModel)]="searchQuery" 
+        (input)="applyFilter()" 
+        class="border-right-none w-full" />
+    </div>
+
+    <div class="flex align-items-center gap-2">
+      <select [(ngModel)]="selectedMethod" (change)="applyFilter()" class="p-inputtext py-2 px-3 text-xs border-round font-bold">
+        <option value="ALL">جميع طرق الدفع</option>
+        <option value="Cash">نقدي (كاش)</option>
+        <option value="Visa">بطاقة / فيزا</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="gym-card p-0 overflow-hidden shadow-2">
+    <p-table [value]="filteredPayments" [paginator]="true" [rows]="10" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>رقم الإيصال</th>
+          <th>العضو</th>
+          <th>الاشتراك</th>
+          <th>المبلغ المسدد</th>
+          <th>تاريخ الدفعة</th>
+          <th>طريقة السداد</th>
+          <th>ملاحظات</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-p>
+        <tr>
+          <td><span class="text-xs font-bold text-700 bg-slate-100 px-2 py-1 border-round">{{ p.id }}</span></td>
+          <td>
+            <span class="font-bold text-sm text-900">{{ getMemberName(p.memberId) }}</span>
+            <span class="text-xs text-500 block" dir="ltr">{{ getMemberPhone(p.memberId) }}</span>
+          </td>
+          <td><span class="text-xs text-700 font-semibold">{{ p.subscriptionId }}</span></td>
+          <td><span class="font-bold text-base text-green-600">{{ p.amount }} ج.م</span></td>
+          <td><span class="text-xs text-700 font-semibold">{{ p.date }}</span></td>
+          <td>
+            <span class="status-badge" [ngClass]="p.method === 'Cash' ? 'active' : 'upcoming'">
+              {{ p.method === 'Cash' ? 'نقدي' : 'فيزا' }}
+            </span>
+          </td>
+          <td><span class="text-xs text-600">{{ p.notes || '--' }}</span></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

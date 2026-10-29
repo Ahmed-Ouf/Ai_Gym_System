@@ -1,0 +1,88 @@
+<header class="navbar-wrapper">
+  <!-- Right Section (in RTL: Start of page): Collapsible toggles & page focus -->
+  <div class="navbar-start">
+    <!-- Desktop Sidebar Toggle -->
+    <button class="toggle-btn hidden lg:flex" (click)="onToggleSidebar()" [title]="sidebarCollapsed ? 'توسيع القائمة' : 'طي القائمة'">
+      <i class="pi" [ngClass]="sidebarCollapsed ? 'pi-align-justify' : 'pi-align-right'"></i>
+    </button>
+    <!-- Mobile Hamburger Toggle -->
+    <button class="toggle-btn lg:hidden" (click)="onToggleMobileSidebar()" title="فتح القائمة">
+      <i class="pi pi-bars"></i>
+    </button>
+    
+    <div class="system-title mr-3 lg:mr-2">
+      <span class="system-heading font-bold text-900">نظام إدارة جيم الحلواني</span>
+      <span class="system-tag text-xs bg-blue-50 text-blue-700 px-2 py-1 border-round font-semibold mr-2 hidden sm:inline-block">نسخة المدير</span>
+    </div>
+  </div>
+
+  <!-- Left Section (in RTL: End of page): Clock, Notifications, Profile -->
+  <div class="navbar-end">
+    <!-- Live Arabic Clock -->
+    <div class="live-clock hidden md:flex">
+      <i class="pi pi-clock clock-icon"></i>
+      <span class="font-medium text-xs">{{ currentTime }}</span>
+    </div>
+
+    <!-- Notification Bell with Expiring Subscriptions Badge -->
+    <div class="nav-action-wrapper" routerLink="/subscriptions" title="اشتراكات تنتهي قريباً">
+      <button class="action-icon-btn">
+        <i class="pi pi-bell"></i>
+        <span class="alert-count-badge" *ngIf="expiringCount > 0">{{ expiringCount }}</span>
+      </button>
+    </div>
+
+    <!-- User Profile Avatar and Dropdown -->
+    <div class="profile-container">
+      <div class="profile-pill" (click)="toggleProfileDropdown()">
+        <div class="profile-avatar">
+          <span>ح</span>
+        </div>
+        <div class="profile-info hidden sm:flex">
+          <span class="profile-name">كابتن الحلواني</span>
+          <span class="profile-role">مدير الصالة الرياضية</span>
+        </div>
+        <i class="pi pi-chevron-down pill-chevron mr-2"></i>
+      </div>
+
+      <!-- Dropdown Panel -->
+      <div class="dropdown-menu" *ngIf="showProfileMenu">
+        <div class="dropdown-header">
+          <div class="avatar-lg">ح</div>
+          <div class="user-details mr-2">
+            <span class="user-name">كابتن أحمد الحلواني</span>
+            <span class="user-email">admin&#64;elhalawanygym.com</span>
+          </div>
+        </div>
+        <hr class="dropdown-divider" />
+        <ul class="dropdown-links">
+          <li>
+            <a class="dropdown-link" routerLink="/members" (click)="showProfileMenu = false">
+              <i class="pi pi-users dropdown-link-icon"></i>
+              <span>سجل الأعضاء</span>
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-link" routerLink="/subscriptions" (click)="showProfileMenu = false">
+              <i class="pi pi-ticket dropdown-link-icon"></i>
+              <span>الاشتراكات والمدفوعات</span>
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-link" routerLink="/admin" (click)="showProfileMenu = false">
+              <i class="pi pi-database dropdown-link-icon"></i>
+              <span>النسخ الاحتياطي والإعدادات</span>
+            </a>
+          </li>
+        </ul>
+        <hr class="dropdown-divider" />
+        <div class="dropdown-footer">
+          <a class="logout-link" href="javascript:void(0)" (click)="showProfileMenu = false">
+            <i class="pi pi-power-off"></i>
+            <span>تسجيل الخروج</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

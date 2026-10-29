@@ -1,0 +1,25 @@
+<div class="layout-wrapper">
+  <!-- Dynamic Sidebar Component -->
+  <app-sidebar 
+    [collapsed]="sidebarCollapsed" 
+    [mobileActive]="mobileSidebarActive" 
+    (closeMobile)="closeMobileSidebar()">
+  </app-sidebar>
+
+  <!-- Right Side Main Section -->
+  <div class="main-container" [class.sidebar-collapsed]="sidebarCollapsed">
+    <!-- Header Navbar Component -->
+    <app-navbar 
+      [sidebarCollapsed]="sidebarCollapsed"
+      (toggleSidebar)="toggleSidebar()" 
+      (toggleMobileSidebar)="toggleMobileSidebar()">
+    </app-navbar>
+
+    <!-- Scrollable Content Canvas -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

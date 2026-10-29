@@ -1,0 +1,15 @@
+.payments-container {
+  padding-bottom: 2rem;
+}
+
+/* Specific filter styling alignment */
+.border-right-none {
+  border-right: none !important;
+}
+
+.border-left-none {
+  border-left: none !important;
+  &:focus {
+    border-left: 1px solid var(--primary-color) !important;
+  }
+}

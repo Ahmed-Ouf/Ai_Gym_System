@@ -1,0 +1,32 @@
+.dashboard-container {
+  direction: rtl;
+  text-align: right;
+}
+
+.stat-card {
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  padding: 1.25rem 1.5rem;
+}
+
+.stat-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-list {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  transition: all 0.2s ease;
+  &:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+  }
+}

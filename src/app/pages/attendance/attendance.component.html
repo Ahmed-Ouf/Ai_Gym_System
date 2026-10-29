@@ -1,0 +1,419 @@
+<div class="attendance-container">
+  <!-- Feedback Notification Toast -->
+  <div *ngIf="alertMsg" 
+       class="alert-toast flex align-items-center justify-content-between gap-3 shadow-3 animate-fadein"
+       [ngClass]="alertSuccess ? 'alert-success' : 'alert-danger'">
+    <div class="flex align-items-center gap-2">
+      <i class="pi text-xl" [ngClass]="alertSuccess ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
+      <span class="font-bold text-sm">{{ alertMsg }}</span>
+    </div>
+    <button (click)="alertMsg = null" class="p-button-text p-button-rounded p-button-plain p-0 close-btn" title="إغلاق">
+      <i class="pi pi-times text-xs"></i>
+    </button>
+  </div>
+
+  <!-- Page Header & Metrics Ribbon -->
+  <div class="header-section mb-4">
+    <div class="flex flex-column lg:flex-row justify-content-between align-items-start lg:align-items-center gap-3 mb-3">
+      <div>
+        <div class="flex align-items-center gap-2 mb-1">
+          <span class="module-tag">
+            <i class="pi pi-stopwatch"></i>
+            <span>إدارة الحضور والانصراف</span>
+          </span>
+          <span class="live-indicator">
+            <span class="pulse-dot"></span>
+            <span>مباشر</span>
+          </span>
+        </div>
+        <h1 class="page-title m-0">تسجيل حضور وانصراف الأبطال</h1>
+        <p class="page-subtitle m-0 mt-1">
+          متابعة فورية لتواجد الأعضاء داخل الصالة، منع تكرار الدخول، وضبط الأنشطة الرياضية لكل جلسة.
+        </p>
+      </div>
+
+      <!-- Quick Metrics Strip -->
+      <div class="metrics-strip flex flex-wrap gap-2">
+        <div class="metric-pill active-pill">
+          <div class="metric-icon">
+            <i class="pi pi-users"></i>
+          </div>
+          <div>
+            <div class="metric-value">{{ activeGymAttendees.length }}</div>
+            <div class="metric-label">في الصالة الآن</div>
+          </div>
+        </div>
+
+        <div class="metric-pill">
+          <div class="metric-icon bg-indigo-50 text-indigo-600">
+            <i class="pi pi-sign-in"></i>
+          </div>
+          <div>
+            <div class="metric-value">{{ todayTotalCheckIns }}</div>
+            <div class="metric-label">حضور اليوم</div>
+          </div>
+        </div>
+
+        <div class="metric-pill">
+          <div class="metric-icon bg-emerald-50 text-emerald-600">
+            <i class="pi pi-check"></i>
+          </div>
+          <div>
+            <div class="metric-value">{{ todayCompletedCheckIns }}</div>
+            <div class="metric-label">أتموا التمرين</div>
+          </div>
+        </div>
+
+        <div class="metric-pill" *ngIf="averageWorkoutDurationMinutes > 0">
+          <div class="metric-icon bg-amber-50 text-amber-600">
+            <i class="pi pi-clock"></i>
+          </div>
+          <div>
+            <div class="metric-value">{{ averageWorkoutDurationMinutes }} د</div>
+            <div class="metric-label">متوسط الجلسة</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Check-in Station (Top Action Console) -->
+  <div class="gym-card checkin-console mb-4">
+    <div class="console-header flex align-items-center justify-content-between mb-3 pb-3 border-bottom-1 border-100">
+      <div class="flex align-items-center gap-2">
+        <div class="console-icon">
+          <i class="pi pi-bolt"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-900 m-0">مكتب تسجيل الدخول الفوري</h2>
+          <p class="text-xs text-500 m-0">اختر العضو والأنشطة التدريبية لتسجيل دخوله فور وصوله الصالة</p>
+        </div>
+      </div>
+      <span class="badge-hint">
+        <i class="pi pi-shield ml-1"></i>
+        حماية ضد التكرار مفعلة
+      </span>
+    </div>
+
+    <div class="grid align-items-start">
+      <!-- Member Search and Picker -->
+      <div class="col-12 lg:col-4">
+        <label class="input-label">
+          <span>ابحث واختر العضو</span>
+          <span class="text-red-500">*</span>
+        </label>
+        
+        <div class="search-box-wrapper mb-2">
+          <i class="pi pi-search search-icon"></i>
+          <input 
+            type="text" 
+            [(ngModel)]="memberSearchTerm" 
+            placeholder="اكتب اسم العضو أو رقم هاتفه..." 
+            class="custom-search-input w-full" />
+        </div>
+
+        <select [(ngModel)]="selectedMemberId" class="custom-select w-full">
+          <option value="">-- اضغط للاختيار من القائمة ({{ searchedMembers.length }} عضو) --</option>
+          <option *ngFor="let m of searchedMembers" [value]="m.id">
+            {{ m.name }} - {{ m.phone }}
+          </option>
+        </select>
+
+        <!-- Selected Member Quick Card Preview -->
+        <div *ngIf="selectedMemberObj" class="member-preview-card mt-3 animate-fadein">
+          <div class="flex align-items-center gap-3">
+            <img [src]="getMemberAvatar(selectedMemberObj.id)" class="preview-avatar" />
+            <div class="flex-1">
+              <div class="flex align-items-center justify-content-between">
+                <span class="font-bold text-sm text-900">{{ selectedMemberObj.name }}</span>
+                <span *ngIf="isSelectedMemberInGym" class="status-chip chip-warning">
+                  <i class="pi pi-exclamation-circle"></i>
+                  بالداخل حالياً
+                </span>
+                <span *ngIf="!isSelectedMemberInGym" class="status-chip chip-ready">
+                  <i class="pi pi-check-circle"></i>
+                  جاهز للدخول
+                </span>
+              </div>
+              <div class="text-xs text-500 mt-1 flex align-items-center gap-2">
+                <span dir="ltr">{{ selectedMemberObj.phone }}</span>
+                <span>•</span>
+                <span class="text-600">اشتراكات مسجلة: {{ selectedMemberSubscriptions.length }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-Activity Selection -->
+      <div class="col-12 lg:col-5">
+        <label class="input-label">
+          <span>الأنشطة والألعاب التدريبية لجلسة اليوم</span>
+          <span class="text-red-500">*</span>
+        </label>
+        <p class="text-xs text-500 m-0 mb-2">يمكنك تحديد أكثر من نشاط لنفس جلسة التمرين:</p>
+        
+        <div class="activities-grid">
+          <div *ngFor="let g of games" 
+               (click)="toggleGameSelection(g.id)"
+               class="activity-chip"
+               [class.selected]="isGameSelected(g.id)">
+            <div class="chip-icon">
+              <i class="pi" [ngClass]="getGameIcon(g.name)"></i>
+            </div>
+            <div class="chip-content">
+              <span class="chip-name">{{ g.name }}</span>
+              <span class="chip-status">
+                <i class="pi" [ngClass]="isGameSelected(g.id) ? 'pi-check' : 'pi-plus'"></i>
+                {{ isGameSelected(g.id) ? 'محدد' : 'إضافة' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="col-12 lg:col-3 flex flex-column justify-content-end">
+        <button 
+          (click)="onLogCheckIn()" 
+          [disabled]="!selectedMemberId || selectedGameIds.length === 0 || isSelectedMemberInGym"
+          class="checkin-btn ripple-btn w-full">
+          <div class="flex align-items-center justify-content-center gap-2">
+            <i class="pi pi-check text-lg"></i>
+            <span class="font-bold text-base">تسجيل الدخول الآن</span>
+          </div>
+          <span class="btn-subtext">تأكيد بدء تمرين العضو فوراً</span>
+        </button>
+
+        <p *ngIf="isSelectedMemberInGym" class="text-xs text-red-600 font-bold text-center mt-2 m-0">
+          ⚠️ هذا العضو مسجل بالداخل بالفعل، لا يمكن تكرار تسجيله!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Currently Inside Gym Section (Live Floor) -->
+  <div class="gym-card live-floor-card mb-4">
+    <div class="flex flex-column sm:flex-row justify-content-between align-items-start sm:align-items-center gap-2 mb-3">
+      <div>
+        <div class="flex align-items-center gap-2">
+          <h2 class="text-lg font-bold text-900 m-0">الأبطال المتواجدون داخل الصالة حالياً</h2>
+          <span class="live-counter-badge">
+            <span class="pulse-dot"></span>
+            <span>{{ activeGymAttendees.length }} يتمرنون الآن</span>
+          </span>
+        </div>
+        <p class="text-xs text-500 m-0 mt-1">سجل خروج العضو بمجرد الانتهاء من حصته لحساب وقت التمرين الفعلي بدقة</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="activeGymAttendees.length === 0" class="empty-floor-state text-center p-5">
+      <div class="empty-icon-ring mx-auto mb-3">
+        <i class="pi pi-compass text-3xl text-400"></i>
+      </div>
+      <h3 class="text-base font-bold text-800 m-0 mb-1">الصالة الرياضية في حالة هدوء</h3>
+      <p class="text-xs text-500 m-0">لا يوجد أعضاء قيد التمرين في هذه اللحظة. استخدم المكتب بالأعلى لتسجيل الدخول.</p>
+    </div>
+
+    <!-- Active attendees cards grid -->
+    <div class="grid" *ngIf="activeGymAttendees.length > 0">
+      <div class="col-12 sm:col-6 lg:col-4" *ngFor="let item of activeGymAttendees">
+        <div class="athlete-training-card">
+          <div class="card-top flex align-items-center justify-content-between mb-3">
+            <div class="flex align-items-center gap-3">
+              <div class="avatar-wrapper">
+                <img [src]="item.member?.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + item.record.memberId" 
+                     class="athlete-avatar" />
+                <span class="online-indicator"></span>
+              </div>
+              <div>
+                <h4 class="athlete-name m-0">{{ item.member?.name || item.record.memberId }}</h4>
+                <div class="text-xs text-500 mt-1" dir="ltr">{{ item.member?.phone }}</div>
+              </div>
+            </div>
+            
+            <div class="duration-badge">
+              <i class="pi pi-hourglass"></i>
+              <span>منذ {{ item.durationMinutes }} دقيقة</span>
+            </div>
+          </div>
+
+          <div class="card-middle mb-3">
+            <div class="activities-tags">
+              <span *ngFor="let gName of item.gameNames" class="game-tag">
+                <i class="pi" [ngClass]="getGameIcon(gName)"></i>
+                <span>{{ gName }}</span>
+              </span>
+            </div>
+            <div class="time-stamp text-xs text-600 mt-2">
+              <i class="pi pi-sign-in ml-1 text-emerald-600"></i>
+              <span>وقت الدخول: <strong>{{ item.timeFormatted }}</strong></span>
+            </div>
+          </div>
+
+          <div class="card-bottom pt-2 border-top-1 border-100">
+            <button 
+              (click)="onLogCheckOut(item.record.id)" 
+              class="checkout-action-btn ripple-btn w-full">
+              <i class="pi pi-sign-out"></i>
+              <span>تسجيل خروج العضو</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Attendance History Section -->
+  <div class="gym-card history-card p-0 overflow-hidden">
+    <!-- Header with Filter Controls -->
+    <div class="history-header p-4 border-bottom-1 border-100 flex flex-column lg:flex-row justify-content-between align-items-start lg:align-items-center gap-3">
+      <div>
+        <h2 class="text-lg font-bold text-900 m-0">سجل الحضور والانصراف الكامل</h2>
+        <p class="text-xs text-500 m-0 mt-1">أرشيف وتدقيق جلسات التمرين لجميع الأعضاء مع حساب المدد</p>
+      </div>
+
+      <div class="flex flex-wrap align-items-center gap-2 w-full lg:w-auto">
+        <!-- Quick Preset Buttons -->
+        <div class="preset-group flex align-items-center">
+          <button 
+            (click)="setFilterPreset('today')"
+            class="preset-btn" 
+            [class.active]="activePreset === 'today'">
+            اليوم
+          </button>
+          <button 
+            (click)="setFilterPreset('yesterday')"
+            class="preset-btn" 
+            [class.active]="activePreset === 'yesterday'">
+            أمس
+          </button>
+          <button 
+            (click)="setFilterPreset('week')"
+            class="preset-btn" 
+            [class.active]="activePreset === 'week'">
+            آخر 7 أيام
+          </button>
+          <button 
+            (click)="setFilterPreset('all')"
+            class="preset-btn" 
+            [class.active]="activePreset === 'all'">
+            الكل
+          </button>
+        </div>
+
+        <!-- Date Input -->
+        <div class="date-picker-wrap">
+          <i class="pi pi-calendar"></i>
+          <input 
+            type="date" 
+            [(ngModel)]="historyFilterDate" 
+            (change)="activePreset = 'all'"
+            class="custom-date-input" />
+        </div>
+
+        <!-- Search Input -->
+        <div class="history-search-wrap flex-1 sm:flex-initial">
+          <i class="pi pi-search"></i>
+          <input 
+            type="text" 
+            placeholder="بحث باسم أو رقم..." 
+            [(ngModel)]="historySearchQuery" 
+            class="custom-history-search" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance Table -->
+    <p-table [value]="filteredHistory" [paginator]="true" [rows]="10" responsiveLayout="scroll" styleClass="p-datatable-striped">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 100px">رقم الجلسة</th>
+          <th>العضو الرياضي</th>
+          <th>تاريخ الحضور</th>
+          <th>وقت الدخول</th>
+          <th>وقت الانصراف</th>
+          <th>مدة الجلسة</th>
+          <th>الأنشطة المنفذة</th>
+          <th>حالة الجلسة</th>
+          <th class="text-center" style="width: 120px">الإجراء</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rec>
+        <tr>
+          <td>
+            <span class="session-id-badge">{{ rec.id }}</span>
+          </td>
+          <td>
+            <div class="flex align-items-center gap-3">
+              <img [src]="getMemberAvatar(rec.memberId)" class="table-avatar" />
+              <div>
+                <span class="font-bold text-sm text-900 block">{{ getMemberName(rec.memberId) }}</span>
+                <span class="text-xs text-500 font-mono" dir="ltr">{{ getMemberPhone(rec.memberId) }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="text-xs font-semibold text-700">{{ formatDate(rec.checkIn) }}</span>
+          </td>
+          <td>
+            <span class="time-chip in-time">
+              <i class="pi pi-arrow-down-left"></i>
+              <span>{{ formatTime(rec.checkIn) }}</span>
+            </span>
+          </td>
+          <td>
+            <span *ngIf="rec.checkOut" class="time-chip out-time">
+              <i class="pi pi-arrow-up-right"></i>
+              <span>{{ formatTime(rec.checkOut) }}</span>
+            </span>
+            <span *ngIf="!rec.checkOut" class="text-xs text-teal-600 font-bold">
+              -- مستمر --
+            </span>
+          </td>
+          <td>
+            <span class="duration-chip" [class.completed]="rec.checkOut">
+              <i class="pi pi-stopwatch"></i>
+              <span>{{ calculateDuration(rec.checkIn, rec.checkOut) }}</span>
+            </span>
+          </td>
+          <td>
+            <div class="flex flex-wrap gap-1">
+              <span class="table-activity-badge">
+                {{ getGamesNames(rec.gameIds) }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <span class="status-pill" [ngClass]="rec.checkOut ? 'pill-completed' : 'pill-active'">
+              <span class="dot" *ngIf="!rec.checkOut"></span>
+              <i class="pi pi-check text-xs" *ngIf="rec.checkOut"></i>
+              <span>{{ rec.checkOut ? 'جلسة مكتملة' : 'يتدرب الآن' }}</span>
+            </span>
+          </td>
+          <td class="text-center">
+            <button 
+              *ngIf="!rec.checkOut" 
+              (click)="onLogCheckOut(rec.id)" 
+              class="table-checkout-btn ripple-btn">
+              <i class="pi pi-sign-out"></i>
+              <span>خروج</span>
+            </button>
+            <span *ngIf="rec.checkOut" class="text-400">
+              <i class="pi pi-check-circle text-green-500 text-lg" title="تم إنهاء الجلسة"></i>
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="9" class="text-center p-5 text-500 font-semibold">
+            <i class="pi pi-inbox text-3xl text-400 block mb-2"></i>
+            لا توجد جلسات حضور مسجلة تطابق التاريخ أو البحث المحدد.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

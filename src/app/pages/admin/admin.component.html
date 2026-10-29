@@ -1,0 +1,197 @@
+<div class="admin-container">
+  <!-- Feedback Alert -->
+  <div *ngIf="feedbackMessage" 
+       class="mb-4 p-3 border-round flex align-items-center gap-2"
+       [ngClass]="feedbackType === 'success' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-red-100 text-red-800 border-red-300'">
+    <i class="pi" [ngClass]="feedbackType === 'success' ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
+    <span class="font-bold">{{ feedbackMessage }}</span>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header mb-4 flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-3">
+    <div>
+      <h1 class="text-3xl font-bold text-900 mb-1">الإدارة وإعدادات النظام</h1>
+      <p class="text-sm text-600">إدارة الأنشطة الرياضية والألعاب، أنواع التمارين، والنسخ الاحتياطي لقاعدة البيانات.</p>
+    </div>
+    <div class="flex gap-2">
+      <button (click)="exportBackup()" class="p-button p-button-success flex align-items-center gap-2">
+        <i class="pi pi-download"></i>
+        <span>تصدير نسخة احتياطية (JSON)</span>
+      </button>
+      <label class="p-button p-button-outlined flex align-items-center gap-2 cursor-pointer m-0">
+        <i class="pi pi-upload"></i>
+        <span>استعادة نسخة</span>
+        <input type="file" accept=".json" (change)="onFileSelected($event)" class="hidden" />
+      </label>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Left Column: Games and Activities -->
+    <div class="col-12 lg:col-6">
+      <div class="gym-card h-full">
+        <div class="flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="text-xl font-bold text-900 m-0">الأنشطة والألعاب الرياضية</h2>
+            <p class="text-xs text-500 m-0 mt-1">إجمالي {{ games.length }} نشاط مسجل في جيم الحلواني</p>
+          </div>
+          <button (click)="openAddGame()" class="p-button p-button-sm p-button-primary flex align-items-center gap-2">
+            <i class="pi pi-plus"></i>
+            <span>إضافة لعبة</span>
+          </button>
+        </div>
+
+        <p-table [value]="games" responsiveLayout="scroll" [rows]="6">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>اسم اللعبة</th>
+              <th>السعر الافتراضي</th>
+              <th>الحالة</th>
+              <th class="text-center">إجراءات</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-game>
+            <tr>
+              <td>
+                <span class="font-bold text-sm">{{ game.name }}</span>
+              </td>
+              <td>
+                <span class="font-bold text-primary">{{ game.defaultPrice }} ج.م</span>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="game.isArchived ? 'expired' : 'active'">
+                  {{ game.isArchived ? 'مؤرشفة' : 'متاحة' }}
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="flex justify-content-center gap-2">
+                  <button (click)="openEditGame(game)" class="p-button p-button-text p-button-sm p-button-secondary" title="تعديل">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button (click)="toggleArchiveGame(game.id)" class="p-button p-button-text p-button-sm" [ngClass]="game.isArchived ? 'p-button-success' : 'p-button-danger'" [title]="game.isArchived ? 'إلغاء الأرشفة' : 'أرشفة'">
+                    <i class="pi" [ngClass]="game.isArchived ? 'pi-refresh' : 'pi-lock'"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Right Column: Training Types -->
+    <div class="col-12 lg:col-6">
+      <div class="gym-card h-full">
+        <div class="flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="text-xl font-bold text-900 m-0">أنواع وعضلات التمارين</h2>
+            <p class="text-xs text-500 m-0 mt-1">تحديد برامج التمارين التدريبية لكل لعبة</p>
+          </div>
+          <button (click)="openAddTrainingType()" class="p-button p-button-sm p-button-primary flex align-items-center gap-2">
+            <i class="pi pi-plus"></i>
+            <span>إضافة تمرين</span>
+          </button>
+        </div>
+
+        <!-- Filter by Game -->
+        <div class="mb-3 flex align-items-center gap-2">
+          <span class="text-xs font-bold text-600">تصفية حسب اللعبة:</span>
+          <select [(ngModel)]="filterGameId" class="p-inputtext py-1 px-2 text-xs border-round">
+            <option value="ALL">جميع الألعاب</option>
+            <option *ngFor="let g of games" [value]="g.id">{{ g.name }}</option>
+          </select>
+        </div>
+
+        <p-table [value]="filteredTrainingTypes" responsiveLayout="scroll" [rows]="6">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>اسم التمرين / العضلة</th>
+              <th>تابعة لنشاط</th>
+              <th class="text-center">حذف</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-tt>
+            <tr>
+              <td>
+                <span class="font-bold text-sm">{{ tt.name }}</span>
+              </td>
+              <td>
+                <span class="text-xs bg-slate-100 text-slate-700 px-2 py-1 border-round font-medium">
+                  {{ getGameName(tt.gameId) }}
+                </span>
+              </td>
+              <td class="text-center">
+                <button (click)="deleteTrainingType(tt.id)" class="p-button p-button-text p-button-danger p-button-sm" title="حذف التمرين">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Full Width: Backup, Restore & Data Reset Section -->
+    <div class="col-12 mt-3">
+      <div class="gym-card bg-slate-900 text-white border-none shadow-3" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+        <div class="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-3">
+          <div>
+            <div class="flex align-items-center gap-2 mb-1">
+              <i class="pi pi-shield text-blue-400 text-xl"></i>
+              <h2 class="text-xl font-bold text-white m-0">النسخ الاحتياطي وإدارة قاعدة البيانات</h2>
+            </div>
+            <p class="text-xs text-slate-300 m-0">يتم حفظ جميع التعديلات تلقائياً في التخزين المحلي للمتصفح. يمكنك تصدير نسخة كاملة كملف JSON واستعادتها في أي وقت على أي جهاز آخر.</p>
+          </div>
+          <div class="flex gap-2">
+            <button (click)="exportBackup()" class="p-button p-button-primary flex align-items-center gap-2">
+              <i class="pi pi-file-export"></i>
+              <span>تصدير JSON</span>
+            </button>
+            <button (click)="resetDemo()" class="p-button p-button-danger p-button-outlined flex align-items-center gap-2 text-white border-red-400">
+              <i class="pi pi-refresh"></i>
+              <span>إعادة تعيين للبيانات الافتراضية</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Dialog -->
+  <p-dialog [(visible)]="showGameDialog" [modal]="true" [header]="editingGame ? 'تعديل نشاط رياضي' : 'إضافة نشاط رياضي جديد'" [style]="{width: '450px'}">
+    <div class="p-fluid">
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">اسم اللعبة / النشاط *</label>
+        <input type="text" pInputText [(ngModel)]="gameName" placeholder="مثال: كمال أجسام، سباحة، لياقة..." class="w-full" />
+      </div>
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">السعر الافتراضي للاشتراك الشهري (ج.م) *</label>
+        <input type="number" pInputText [(ngModel)]="gamePrice" min="0" class="w-full" />
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button (click)="showGameDialog = false" class="p-button p-button-text p-button-secondary">إلغاء</button>
+      <button (click)="saveGame()" class="p-button p-button-primary">حفظ النشاط</button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Training Type Dialog -->
+  <p-dialog [(visible)]="showTypeDialog" [modal]="true" header="إضافة نوع / عضلة تمرين جديدة" [style]="{width: '450px'}">
+    <div class="p-fluid">
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">تابع للعبة / النشاط *</label>
+        <select [(ngModel)]="selectedGameIdForType" class="p-inputtext w-full">
+          <option *ngFor="let g of games" [value]="g.id">{{ g.name }}</option>
+        </select>
+      </div>
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">اسم التمرين / العضلة *</label>
+        <input type="text" pInputText [(ngModel)]="trainingTypeName" placeholder="مثال: عضلة الصدر، الظهر، كارديو هيت..." class="w-full" />
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button (click)="showTypeDialog = false" class="p-button p-button-text p-button-secondary">إلغاء</button>
+      <button (click)="saveTrainingType()" class="p-button p-button-primary">حفظ التمرين</button>
+    </ng-template>
+  </p-dialog>
+</div>

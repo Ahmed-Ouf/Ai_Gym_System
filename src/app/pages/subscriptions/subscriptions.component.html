@@ -1,0 +1,373 @@
+<div class="subscriptions-container">
+  <!-- Feedback Notification -->
+  <div *ngIf="alertMsg" 
+       class="mb-4 p-3 border-round flex align-items-center gap-2 shadow-2"
+       [ngClass]="alertSuccess ? 'bg-green-100 text-green-900 border-green-300' : 'bg-red-100 text-red-900 border-red-300'">
+    <i class="pi" [ngClass]="alertSuccess ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
+    <span class="font-bold text-sm">{{ alertMsg }}</span>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header mb-4 flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-3">
+    <div>
+      <h1 class="text-3xl font-extrabold text-900 m-0">الاشتراكات والمدفوعات المالية</h1>
+      <p class="text-sm text-600 m-0 mt-1">متابعة دقيقة لاشتراكات الأعضاء، تجديد الخطط، وتحصيل المدفوعات النقدية والبطاقات.</p>
+    </div>
+    <div class="flex gap-2">
+      <button (click)="openAddSubscription()" class="p-button p-button-primary ripple-btn flex align-items-center gap-2">
+        <i class="pi pi-ticket"></i>
+        <span>إضافة اشتراك جديد</span>
+      </button>
+      <button (click)="openAddPayment()" class="p-button p-button-success ripple-btn flex align-items-center gap-2">
+        <i class="pi pi-credit-card"></i>
+        <span>تسجيل دفعة جديدة</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs Switcher -->
+  <div class="flex gap-2 mb-4 border-bottom-1 border-200 pb-3">
+    <button (click)="activeTab = 'subscriptions'" 
+            class="p-button p-button-sm text-sm font-bold"
+            [ngClass]="activeTab === 'subscriptions' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'">
+      <i class="pi pi-ticket mr-1"></i>
+      <span>سجل الاشتراكات ({{ subscriptions.length }})</span>
+    </button>
+    <button (click)="activeTab = 'payments'" 
+            class="p-button p-button-sm text-sm font-bold"
+            [ngClass]="activeTab === 'payments' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'">
+      <i class="pi pi-wallet mr-1"></i>
+      <span>سجل المدفوعات والإيرادات ({{ payments.length }})</span>
+    </button>
+  </div>
+
+  <!-- ======================== TAB 1: SUBSCRIPTIONS ======================== -->
+  <div *ngIf="activeTab === 'subscriptions'">
+    <!-- Filter Toolbar -->
+    <div class="gym-card mb-4 py-3 px-4 flex flex-column lg:flex-row justify-content-between align-items-center gap-3">
+      <!-- Search Input -->
+      <div class="p-inputgroup max-w-28rem w-full">
+        <span class="p-inputgroup-addon bg-white border-left-none">
+          <i class="pi pi-search text-500"></i>
+        </span>
+        <input 
+          type="text" 
+          pInputText 
+          placeholder="ابحث بالاسم، الهاتف، النشاط، أو كود الاشتراك..." 
+          [(ngModel)]="subSearchQuery" 
+          (input)="applySubFilter()" 
+          class="border-right-none w-full" />
+      </div>
+
+      <!-- Status Filter Buttons -->
+      <div class="flex flex-wrap gap-2">
+        <button (click)="subStatusFilter = 'ALL'; applySubFilter()" 
+                class="p-button p-button-sm text-xs font-bold"
+                [ngClass]="subStatusFilter === 'ALL' ? 'p-button-secondary' : 'p-button-text p-button-secondary'">
+          الكل ({{ subscriptions.length }})
+        </button>
+        <button (click)="subStatusFilter = 'Active'; applySubFilter()" 
+                class="p-button p-button-sm text-xs font-bold"
+                [ngClass]="subStatusFilter === 'Active' ? 'p-button-success' : 'p-button-text p-button-success'">
+          نشط
+        </button>
+        <button (click)="subStatusFilter = 'ExpiringSoon'; applySubFilter()" 
+                class="p-button p-button-sm text-xs font-bold"
+                [ngClass]="subStatusFilter === 'ExpiringSoon' ? 'p-button-warning' : 'p-button-text p-button-warning'">
+          ينتهي قريباً
+        </button>
+        <button (click)="subStatusFilter = 'Upcoming'; applySubFilter()" 
+                class="p-button p-button-sm text-xs font-bold"
+                [ngClass]="subStatusFilter === 'Upcoming' ? 'p-button-info' : 'p-button-text p-button-info'">
+          قادم
+        </button>
+        <button (click)="subStatusFilter = 'Expired'; applySubFilter()" 
+                class="p-button p-button-sm text-xs font-bold"
+                [ngClass]="subStatusFilter === 'Expired' ? 'p-button-danger' : 'p-button-text p-button-danger'">
+          منتهي
+        </button>
+      </div>
+    </div>
+
+    <!-- Subscriptions Table -->
+    <div class="gym-card p-0 overflow-hidden shadow-2">
+      <p-table [value]="filteredSubscriptions" [paginator]="true" [rows]="10" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>كود الاشتراك</th>
+            <th>العضو المشترك</th>
+            <th>النشاط الرياضي</th>
+            <th>نوع الخطة</th>
+            <th>تاريخ البدء</th>
+            <th>تاريخ الانتهاء</th>
+            <th>سعر الاشتراك</th>
+            <th>الحالة</th>
+            <th class="text-center">إجراءات</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-sub>
+          <tr>
+            <td>
+              <span class="text-xs font-bold text-700 bg-slate-100 px-2 py-1 border-round">{{ sub.id }}</span>
+            </td>
+            <td>
+              <div class="flex align-items-center gap-2">
+                <img [src]="getMemberAvatar(sub.memberId)" class="w-2rem h-2rem border-circle" />
+                <div>
+                  <span class="font-bold text-sm text-900 block">{{ getMemberName(sub.memberId) }}</span>
+                  <span class="text-xs text-500" dir="ltr">{{ getMemberPhone(sub.memberId) }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="font-bold text-sm text-primary">{{ getGameName(sub.gameId) }}</span>
+            </td>
+            <td>
+              <span class="text-xs bg-slate-100 text-slate-700 px-2 py-1 border-round font-semibold">
+                {{ getPlanTypeName(sub.planType) }}
+              </span>
+            </td>
+            <td><span class="text-xs text-700 font-semibold">{{ sub.startDate }}</span></td>
+            <td><span class="text-xs text-700 font-semibold">{{ sub.endDate }}</span></td>
+            <td><span class="font-bold text-900">{{ sub.price }} ج.م</span></td>
+            <td>
+              <span class="status-badge" [ngClass]="getSubscriptionStatusClass(sub)">
+                {{ getSubscriptionStatus(sub) }}
+              </span>
+            </td>
+            <td class="text-center">
+              <button (click)="openAddPayment(sub.memberId, sub.id)" class="p-button p-button-text p-button-sm p-button-success font-bold text-xs" title="تسجيل دفعة لهذا الاشتراك">
+                <i class="pi pi-credit-card mr-1"></i>
+                <span>سداد دفعة</span>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9" class="text-center p-4 text-500 font-semibold">
+              لم يتم العثور على أي اشتراكات مطابقة.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- ======================== TAB 2: PAYMENTS ======================== -->
+  <div *ngIf="activeTab === 'payments'">
+    <!-- Filter Toolbar -->
+    <div class="gym-card mb-4 py-3 px-4 flex flex-column lg:flex-row justify-content-between align-items-center gap-3">
+      <!-- Search Input -->
+      <div class="p-inputgroup max-w-28rem w-full">
+        <span class="p-inputgroup-addon bg-white border-left-none">
+          <i class="pi pi-search text-500"></i>
+        </span>
+        <input 
+          type="text" 
+          pInputText 
+          placeholder="ابحث باسم العضو، الهاتف، كود الدفعة..." 
+          [(ngModel)]="paySearchQuery" 
+          (input)="applyPayFilter()" 
+          class="border-right-none w-full" />
+      </div>
+
+      <div class="flex align-items-center gap-3">
+        <!-- Method Filter -->
+        <select [(ngModel)]="payMethodFilter" (change)="applyPayFilter()" class="p-inputtext py-2 px-3 text-xs border-round font-bold">
+          <option value="ALL">جميع طرق السداد</option>
+          <option value="Cash">نقدي (كاش)</option>
+          <option value="Visa">بطاقة / فيزا</option>
+        </select>
+
+        <!-- Total Revenue Box -->
+        <div class="bg-green-50 border-1 border-green-300 py-2 px-3 border-round text-left">
+          <span class="text-xs text-green-700 font-bold block">إجمالي الدفعات المفلترة:</span>
+          <span class="text-lg font-black text-green-900">{{ getTotalRevenue() }} ج.م</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="gym-card p-0 overflow-hidden shadow-2">
+      <p-table [value]="filteredPayments" [paginator]="true" [rows]="10" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>كود الإيصال</th>
+            <th>العضو صاحب الدفعة</th>
+            <th>الاشتراك المرتبط</th>
+            <th>المبلغ المسدد</th>
+            <th>تاريخ الدفعة</th>
+            <th>طريقة السداد</th>
+            <th>ملاحظات</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-pay>
+          <tr>
+            <td>
+              <span class="text-xs font-bold text-700 bg-slate-100 px-2 py-1 border-round">{{ pay.id }}</span>
+            </td>
+            <td>
+              <div class="flex align-items-center gap-2">
+                <img [src]="getMemberAvatar(pay.memberId)" class="w-2rem h-2rem border-circle" />
+                <div>
+                  <span class="font-bold text-sm text-900 block">{{ getMemberName(pay.memberId) }}</span>
+                  <span class="text-xs text-500" dir="ltr">{{ getMemberPhone(pay.memberId) }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 border-round">{{ pay.subscriptionId }}</span>
+            </td>
+            <td>
+              <span class="font-bold text-base text-green-600">{{ pay.amount }} ج.م</span>
+            </td>
+            <td><span class="text-xs text-700 font-semibold">{{ pay.date }}</span></td>
+            <td>
+              <span class="status-badge" [ngClass]="pay.method === 'Cash' ? 'active' : 'upcoming'">
+                <i class="pi" [ngClass]="pay.method === 'Cash' ? 'pi-money-bill' : 'pi-credit-card'"></i>
+                <span>{{ pay.method === 'Cash' ? 'نقدي (كاش)' : 'بطاقة (فيزا)' }}</span>
+              </span>
+            </td>
+            <td>
+              <span class="text-xs text-600">{{ pay.notes || 'سداد اشتراك' }}</span>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center p-4 text-500 font-semibold">
+              لم يتم العثور على أي مدفوعات مطابقة.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- ======================== DIALOG: ADD SUBSCRIPTION ======================== -->
+  <p-dialog [(visible)]="showAddSubDialog" [modal]="true" header="إضافة اشتراك جديد (مع منع التداخل)" [style]="{width: '520px'}">
+    <div class="p-fluid">
+      <!-- Searchable Member Selection -->
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">بحث واختيار العضو *</label>
+        <input 
+          type="text" 
+          pInputText 
+          [(ngModel)]="memberSearchTermForSub" 
+          placeholder="اكتب لتصفية الأعضاء بالاسم أو الهاتف..." 
+          class="w-full mb-1 text-xs" />
+        <select [(ngModel)]="selectedMemberIdForSub" class="p-inputtext w-full font-bold">
+          <option *ngFor="let m of searchedMembersForSub" [value]="m.id">
+            {{ m.name }} ({{ m.phone }})
+          </option>
+        </select>
+        <small class="text-500 text-xs">مطابق {{ searchedMembersForSub.length }} عضو</small>
+      </div>
+
+      <!-- Game Selection -->
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">اللعبة / النشاط الرياضي *</label>
+        <select [(ngModel)]="selectedGameIdForSub" (change)="onGameChange()" class="p-inputtext w-full">
+          <option *ngFor="let g of games" [value]="g.id">
+            {{ g.name }} (السعر الافتراضي: {{ g.defaultPrice }} ج.م)
+          </option>
+        </select>
+      </div>
+
+      <!-- Plan Type -->
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">نوع الخطة *</label>
+        <select [(ngModel)]="newSubPlanType" (change)="calculateEndDate()" class="p-inputtext w-full">
+          <option value="Monthly">شهري (شهر واحد)</option>
+          <option value="Quarterly">ربع سنوي (3 أشهر)</option>
+          <option value="Yearly">سنوي (12 شهر)</option>
+        </select>
+      </div>
+
+      <!-- Dates with Validation -->
+      <div class="grid mb-2">
+        <div class="col-6">
+          <label class="font-bold text-sm mb-1 block">تاريخ البدء *</label>
+          <input type="date" pInputText [(ngModel)]="newSubStartDate" (change)="calculateEndDate()" class="w-full" />
+        </div>
+        <div class="col-6">
+          <label class="font-bold text-sm mb-1 block">تاريخ الانتهاء *</label>
+          <input type="date" pInputText [(ngModel)]="newSubEndDate" class="w-full" />
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">سعر الاشتراك (ج.م) *</label>
+        <input type="number" pInputText [(ngModel)]="newSubPrice" min="0" class="w-full font-bold" />
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button (click)="showAddSubDialog = false" class="p-button p-button-text p-button-secondary">إلغاء</button>
+      <button (click)="saveSubscription()" class="p-button p-button-primary">حفظ الاشتراك</button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- ======================== DIALOG: ADD PAYMENT ======================== -->
+  <p-dialog [(visible)]="showAddPayDialog" [modal]="true" header="تسجيل دفعة مالية جديدة" [style]="{width: '520px'}">
+    <div class="p-fluid">
+      <!-- Searchable Member Selection -->
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">بحث واختيار العضو *</label>
+        <input 
+          type="text" 
+          pInputText 
+          [(ngModel)]="memberSearchTermForPay" 
+          placeholder="اكتب لتصفية الأعضاء بالاسم أو الهاتف..." 
+          class="w-full mb-1 text-xs" />
+        <select [(ngModel)]="selectedMemberIdForPay" (change)="onMemberChangeForPay()" class="p-inputtext w-full font-bold">
+          <option *ngFor="let m of searchedMembersForPay" [value]="m.id">
+            {{ m.name }} ({{ m.phone }})
+          </option>
+        </select>
+      </div>
+
+      <!-- Subscription Link -->
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">الاشتراك المراد سداد قيمته *</label>
+        <select [(ngModel)]="selectedSubIdForPay" (change)="onSubChangeForPay()" class="p-inputtext w-full">
+          <option *ngFor="let s of getMemberSubscriptionsForPay()" [value]="s.id">
+            {{ getGameName(s.gameId) }} - {{ s.price }} ج.م (من {{ s.startDate }} إلى {{ s.endDate }})
+          </option>
+        </select>
+        <small *ngIf="getMemberSubscriptionsForPay().length === 0" class="text-red-500 font-bold block mt-1">
+          لا يوجد اشتراكات مسجلة لهذا العضو حتى الآن. يرجى إضافة اشتراك أولاً.
+        </small>
+      </div>
+
+      <div class="grid mb-2">
+        <div class="col-6">
+          <label class="font-bold text-sm mb-1 block">المبلغ المدفوع (ج.م) *</label>
+          <input type="number" pInputText [(ngModel)]="newPayAmount" min="0" class="w-full font-bold" />
+        </div>
+        <div class="col-6">
+          <label class="font-bold text-sm mb-1 block">طريقة السداد *</label>
+          <select [(ngModel)]="newPayMethod" class="p-inputtext w-full font-bold">
+            <option value="Cash">نقدي (كاش)</option>
+            <option value="Visa">بطاقة / فيزا</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">تاريخ الدفعة *</label>
+        <input type="date" pInputText [(ngModel)]="newPayDate" class="w-full" />
+      </div>
+
+      <div class="field mb-3">
+        <label class="font-bold text-sm mb-1 block">ملاحظات السداد</label>
+        <input type="text" pInputText [(ngModel)]="newPayNotes" placeholder="مثال: رقم العملية، دفعة مقدمة..." class="w-full" />
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button (click)="showAddPayDialog = false" class="p-button p-button-text p-button-secondary">إلغاء</button>
+      <button (click)="savePayment()" class="p-button p-button-success">تأكيد وقيد الدفعة</button>
+    </ng-template>
+  </p-dialog>
+</div>

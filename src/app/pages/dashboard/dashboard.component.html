@@ -32,21 +32,21 @@
 
       <!-- Quick Actions Group -->
       <div class="flex flex-wrap gap-2 w-full lg:w-auto">
-        <button (click)="openQuickCheckIn()" class="p-button p-button-success ripple-btn flex align-items-center gap-2 font-bold shadow-1">
-          <i class="pi pi-sign-in"></i>
-          <span>حضور سريع</span>
+        <button (click)="openQuickCheckIn()" class="btn-border-action border-emerald ripple-btn">
+          <span class="icon-pod pod-emerald"><i class="pi pi-sign-in"></i></span>
+          <span class="btn-label">حضور سريع</span>
         </button>
-        <button (click)="openAddMember()" class="p-button p-button-primary ripple-btn flex align-items-center gap-2 font-bold shadow-1">
-          <i class="pi pi-user-plus"></i>
-          <span>عضو جديد</span>
+        <button (click)="openAddMember()" class="btn-border-action border-blue ripple-btn">
+          <span class="icon-pod pod-blue"><i class="pi pi-user-plus"></i></span>
+          <span class="btn-label">عضو جديد</span>
         </button>
-        <button (click)="openAddSubscription()" class="p-button p-button-outlined p-button-primary ripple-btn flex align-items-center gap-2 font-bold bg-white">
-          <i class="pi pi-ticket"></i>
-          <span>اشتراك جديد</span>
+        <button (click)="openAddSubscription()" class="btn-border-action border-purple ripple-btn">
+          <span class="icon-pod pod-purple"><i class="pi pi-ticket"></i></span>
+          <span class="btn-label">اشتراك جديد</span>
         </button>
-        <button (click)="openAddPayment()" class="p-button p-button-outlined p-button-secondary ripple-btn flex align-items-center gap-2 font-bold bg-white">
-          <i class="pi pi-wallet"></i>
-          <span>تسجيل دفعة</span>
+        <button (click)="openAddPayment()" class="btn-border-action border-graphite ripple-btn">
+          <span class="icon-pod pod-graphite"><i class="pi pi-wallet"></i></span>
+          <span class="btn-label">تسجيل دفعة</span>
         </button>
       </div>
     </div>

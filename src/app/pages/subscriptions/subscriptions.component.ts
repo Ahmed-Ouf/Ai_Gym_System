@@ -33,6 +33,10 @@ import { DropdownModule } from 'primeng/dropdown';
   styleUrls: ['./subscriptions.component.scss']
 })
 export class SubscriptionsComponent implements OnInit {
+  get activeMembers(): Member[] {
+    return this.members.filter(m => !m.isArchived);
+  }
+
   members: Member[] = [];
   games: Game[] = [];
   subscriptions: Subscription[] = [];

@@ -25,6 +25,15 @@ import { DropdownModule } from 'primeng/dropdown';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+  get activeMembers(): Member[] {
+    return this.members.filter(m => !m.isArchived);
+  }
+
+  getMemberAvatar(memberId: string): string {
+    const m = this.gymService.getMemberById(memberId);
+    return m?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${memberId}`;
+  }
+
   members: Member[] = [];
   games: Game[] = [];
   subscriptions: Subscription[] = [];
@@ -323,10 +332,63 @@ export class DashboardComponent implements OnInit {
   }
 
   // Quick Action: Check-in
+  // Quick Action: Check-in
   openQuickCheckIn(): void {
     this.quickCheckInMemberId = '';
     this.quickCheckInGameIds = this.games.length > 0 ? [this.games[0].id] : [];
     this.showQuickCheckInDialog = true;
+  }
+
+  get quickCheckInMember(): Member | undefined {
+    return this.members.find(m => m.id === this.quickCheckInMemberId);
+  }
+
+  get quickCheckInMemberStatus(): { isValid: boolean; message: string; type: 'active' | 'expiring' | 'expired' | 'none' | 'inside' } | null {
+    if (!this.quickCheckInMemberId) return null;
+
+    if (this.gymService.isMemberCurrentlyInGym(this.quickCheckInMemberId)) {
+      return {
+        isValid: false,
+        message: 'العضو متواجد بالفعل داخل الصالة الرياضية الآن!',
+        type: 'inside'
+      };
+    }
+
+    const subs = this.gymService.getMemberSubscriptions(this.quickCheckInMemberId);
+    if (subs.length === 0) {
+      return {
+        isValid: false,
+        message: 'لا يوجد اشتراك مسجل لهذا العضو، يرجى إضافة اشتراك أولاً.',
+        type: 'none'
+      };
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const validSubs = subs.filter(s => s.endDate >= todayStr && s.startDate <= todayStr);
+    if (validSubs.length > 0) {
+      const activeGames = validSubs.map(s => this.getGameName(s.gameId)).join('، ');
+      return {
+        isValid: true,
+        message: `اشتراك ساري في (${activeGames}) حتى ${validSubs[0].endDate}`,
+        type: 'active'
+      };
+    }
+
+    return {
+      isValid: false,
+      message: `الاشتراك منتهٍ منذ ${subs[0].endDate}، يرجى تجديد الاشتراك.`,
+      type: 'expired'
+    };
+  }
+
+  onQuickCheckInMemberChange(): void {
+    if (!this.quickCheckInMemberId) return;
+    const subs = this.gymService.getMemberSubscriptions(this.quickCheckInMemberId);
+    const todayStr = new Date().toISOString().split('T')[0];
+    const activeSub = subs.find(s => s.endDate >= todayStr);
+    if (activeSub) {
+      this.quickCheckInGameIds = [activeSub.gameId];
+    }
   }
 
   toggleCheckInGame(gameId: string): void {

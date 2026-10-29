@@ -8,6 +8,7 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-attendance',
@@ -18,7 +19,8 @@ import { DialogModule } from 'primeng/dialog';
     TableModule,
     ButtonModule,
     InputTextModule,
-    DialogModule
+    DialogModule,
+    DropdownModule
   ],
   templateUrl: './attendance.component.html',
   styleUrls: ['./attendance.component.scss']
@@ -107,6 +109,10 @@ export class AttendanceComponent implements OnInit {
           durationMinutes
         };
       });
+  }
+
+  get activeMembers(): Member[] {
+    return this.members.filter(m => !m.isArchived);
   }
 
   // Filterable member list for check-in

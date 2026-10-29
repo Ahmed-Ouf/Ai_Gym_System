@@ -298,7 +298,7 @@
   </div>
 
   <!-- DIALOG: Add Member -->
-  <p-dialog [(visible)]="showAddMemberDialog" [modal]="true" header="تسجيل بطل جديد في جيم الحلواني" [style]="{width: '520px'}">
+  <p-dialog [(visible)]="showAddMemberDialog" [modal]="true" header="تسجيل بطل جديد في جيم الحلواني" [style]="{width: '95vw', maxWidth: '520px'}" [breakpoints]="{'960px': '75vw', '640px': '95vw'}">
     <div class="p-fluid">
       <div class="field mb-3">
         <label class="font-bold text-xs text-700 mb-1 block">اسم العضو بالكامل *</label>
@@ -327,21 +327,48 @@
       </div>
     </div>
     <ng-template pTemplate="footer">
-      <button (click)="showAddMemberDialog = false" class="p-button p-button-text p-button-secondary font-bold">إلغاء</button>
-      <button (click)="saveNewMember()" class="p-button p-button-primary font-bold">تسجيل وحفظ</button>
+      <button (click)="showAddMemberDialog = false" class="p-button p-button-outlined p-button-secondary font-bold">إلغاء</button>
+      <button (click)="saveNewMember()" class="p-button p-button-primary font-bold">
+        <i class="pi pi-check ml-1"></i>
+        <span>تسجيل وحفظ</span>
+      </button>
     </ng-template>
   </p-dialog>
 
   <!-- DIALOG: Add Subscription -->
-  <p-dialog [(visible)]="showAddSubDialog" [modal]="true" header="إضافة اشتراك جديد لعضو" [style]="{width: '540px'}">
+  <p-dialog [(visible)]="showAddSubDialog" [modal]="true" header="إضافة اشتراك جديد لعضو" [style]="{width: '95vw', maxWidth: '540px'}" [breakpoints]="{'960px': '75vw', '640px': '95vw'}">
     <div class="p-fluid">
       <div class="field mb-3">
         <label class="font-bold text-xs text-700 mb-1 block">اختيار العضو * (بحث بالاسم أو الهاتف)</label>
-        <select [(ngModel)]="selectedMemberIdForSub" class="p-inputtext w-full font-bold text-sm">
-          <option *ngFor="let m of members" [value]="m.id">
-            {{ m.name }} ({{ m.phone }})
-          </option>
-        </select>
+        <p-dropdown 
+          [options]="activeMembers" 
+          [(ngModel)]="selectedMemberIdForSub" 
+          optionLabel="name" 
+          optionValue="id" 
+          [filter]="true" 
+          filterBy="name,phone" 
+          filterPlaceholder="ابحث بالاسم أو رقم الهاتف..."
+          [showClear]="true"
+          placeholder="-- ابحث بالاسم أو الهاتف --" 
+          appendTo="body"
+          styleClass="w-full custom-prime-dropdown font-bold">
+          <ng-template let-m pTemplate="item">
+            <div class="flex align-items-center gap-2 py-1">
+              <img [src]="getMemberAvatar(m.id)" class="dd-item-avatar" />
+              <div class="flex-1">
+                <div class="font-bold text-sm text-900">{{ m.name }}</div>
+                <div class="text-xs text-500 font-mono" dir="ltr">{{ m.phone }}</div>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template let-m pTemplate="selectedItem">
+            <div class="flex align-items-center gap-2" *ngIf="m">
+              <img [src]="getMemberAvatar(m.id)" class="dd-selected-avatar" />
+              <span class="font-bold text-sm text-900">{{ m.name }}</span>
+              <span class="text-xs text-500 font-mono" dir="ltr">({{ m.phone }})</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
       </div>
       <div class="field mb-3">
         <label class="font-bold text-xs text-700 mb-1 block">النشاط الرياضي *</label>
@@ -375,19 +402,49 @@
       </div>
     </div>
     <ng-template pTemplate="footer">
-      <button (click)="showAddSubDialog = false" class="p-button p-button-text p-button-secondary font-bold">إلغاء</button>
-      <button (click)="saveNewSubscription()" class="p-button p-button-primary font-bold">تأكيد الاشتراك</button>
+      <button (click)="showAddSubDialog = false" class="p-button p-button-outlined p-button-secondary font-bold">إلغاء</button>
+      <button (click)="saveNewSubscription()" class="p-button p-button-primary font-bold">
+        <i class="pi pi-check ml-1"></i>
+        <span>تأكيد الاشتراك</span>
+      </button>
     </ng-template>
   </p-dialog>
 
   <!-- DIALOG: Add Payment -->
-  <p-dialog [(visible)]="showAddPaymentDialog" [modal]="true" header="تسجيل دفعة جديدة" [style]="{width: '520px'}">
+  <p-dialog [(visible)]="showAddPaymentDialog" [modal]="true" header="تسجيل دفعة جديدة" [style]="{width: '95vw', maxWidth: '520px'}" [breakpoints]="{'960px': '75vw', '640px': '95vw'}">
     <div class="p-fluid">
       <div class="field mb-3">
         <label class="font-bold text-xs text-700 mb-1 block">اختيار العضو *</label>
-        <select [(ngModel)]="selectedMemberIdForPay" (change)="onMemberChangeForPay()" class="p-inputtext w-full font-bold text-sm">
-          <option *ngFor="let m of members" [value]="m.id">{{ m.name }} ({{ m.phone }})</option>
-        </select>
+        <p-dropdown 
+          [options]="activeMembers" 
+          [(ngModel)]="selectedMemberIdForPay" 
+          (onChange)="onMemberChangeForPay()"
+          optionLabel="name" 
+          optionValue="id" 
+          [filter]="true" 
+          filterBy="name,phone" 
+          filterPlaceholder="ابحث بالاسم أو رقم الهاتف..."
+          [showClear]="true"
+          placeholder="-- ابحث بالاسم أو الهاتف --" 
+          appendTo="body"
+          styleClass="w-full custom-prime-dropdown font-bold">
+          <ng-template let-m pTemplate="item">
+            <div class="flex align-items-center gap-2 py-1">
+              <img [src]="getMemberAvatar(m.id)" class="dd-item-avatar" />
+              <div class="flex-1">
+                <div class="font-bold text-sm text-900">{{ m.name }}</div>
+                <div class="text-xs text-500 font-mono" dir="ltr">{{ m.phone }}</div>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template let-m pTemplate="selectedItem">
+            <div class="flex align-items-center gap-2" *ngIf="m">
+              <img [src]="getMemberAvatar(m.id)" class="dd-selected-avatar" />
+              <span class="font-bold text-sm text-900">{{ m.name }}</span>
+              <span class="text-xs text-500 font-mono" dir="ltr">({{ m.phone }})</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
       </div>
       <div class="field mb-3">
         <label class="font-bold text-xs text-700 mb-1 block">الاشتراك المرتبط بهذه الدفعة *</label>
@@ -419,38 +476,83 @@
       </div>
     </div>
     <ng-template pTemplate="footer">
-      <button (click)="showAddPaymentDialog = false" class="p-button p-button-text p-button-secondary font-bold">إلغاء</button>
-      <button (click)="savePayment()" class="p-button p-button-primary font-bold">تسجيل الإيصال</button>
+      <button (click)="showAddPaymentDialog = false" class="p-button p-button-outlined p-button-secondary font-bold">إلغاء</button>
+      <button (click)="savePayment()" class="p-button p-button-primary font-bold">
+        <i class="pi pi-check ml-1"></i>
+        <span>تسجيل الإيصال</span>
+      </button>
     </ng-template>
   </p-dialog>
 
   <!-- DIALOG: Quick Check-in -->
-  <p-dialog [(visible)]="showQuickCheckInDialog" [modal]="true" header="تسجيل حضور سريع لصالة جيم الحلواني" [style]="{width: '520px'}">
+  <p-dialog [(visible)]="showQuickCheckInDialog" [modal]="true" header="تسجيل حضور سريع لصالة جيم الحلواني" [style]="{width: '95vw', maxWidth: '520px'}" [breakpoints]="{'960px': '75vw', '640px': '95vw'}">
     <div class="p-fluid">
       <div class="field mb-3">
         <label class="font-bold text-xs text-700 mb-1 block">اختر العضو * (بحث بالاسم أو الهاتف)</label>
-        <select [(ngModel)]="quickCheckInMemberId" class="p-inputtext w-full font-bold text-sm">
-          <option value="">-- اضغط لاختيار العضو --</option>
-          <option *ngFor="let m of members" [value]="m.id">{{ m.name }} ({{ m.phone }})</option>
-        </select>
+        <p-dropdown 
+          [options]="activeMembers" 
+          [(ngModel)]="quickCheckInMemberId" 
+          (onChange)="onQuickCheckInMemberChange()"
+          optionLabel="name" 
+          optionValue="id" 
+          [filter]="true" 
+          filterBy="name,phone" 
+          filterPlaceholder="ابحث بالاسم أو رقم الهاتف..."
+          [showClear]="true"
+          placeholder="-- ابحث بالاسم أو الهاتف --" 
+          appendTo="body"
+          styleClass="w-full custom-prime-dropdown font-bold">
+          <ng-template let-m pTemplate="item">
+            <div class="flex align-items-center gap-2 py-1">
+              <img [src]="getMemberAvatar(m.id)" class="dd-item-avatar" />
+              <div class="flex-1">
+                <div class="font-bold text-sm text-900">{{ m.name }}</div>
+                <div class="text-xs text-500 font-mono" dir="ltr">{{ m.phone }}</div>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template let-m pTemplate="selectedItem">
+            <div class="flex align-items-center gap-2" *ngIf="m">
+              <img [src]="getMemberAvatar(m.id)" class="dd-selected-avatar" />
+              <span class="font-bold text-sm text-900">{{ m.name }}</span>
+              <span class="text-xs text-500 font-mono" dir="ltr">({{ m.phone }})</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+
+      <!-- Member Live Status Card -->
+      <div *ngIf="quickCheckInMemberStatus" class="member-quick-status-card mb-3" [ngClass]="quickCheckInMemberStatus.type">
+        <div class="flex align-items-center gap-2">
+          <i class="pi text-sm" [ngClass]="{
+            'pi-check-circle': quickCheckInMemberStatus.type === 'active',
+            'pi-exclamation-triangle': quickCheckInMemberStatus.type === 'expiring' || quickCheckInMemberStatus.type === 'inside',
+            'pi-times-circle': quickCheckInMemberStatus.type === 'expired' || quickCheckInMemberStatus.type === 'none'
+          }"></i>
+          <span class="text-xs font-bold">{{ quickCheckInMemberStatus.message }}</span>
+        </div>
       </div>
 
       <div class="field mb-3">
         <label class="font-bold text-xs text-700 mb-2 block">الأنشطة التي سيتدرب عليها اليوم:</label>
         <div class="flex flex-wrap gap-2">
-          <div *ngFor="let g of games" 
-               (click)="toggleCheckInGame(g.id)"
-               class="cursor-pointer py-1 px-3 border-round border-1 transition-all text-xs font-bold flex align-items-center gap-1"
-               [ngClass]="isCheckInGameSelected(g.id) ? 'bg-primary text-white border-primary shadow-1' : 'bg-slate-100 text-slate-700 border-slate-300'">
+          <button type="button" 
+                  *ngFor="let g of games" 
+                  (click)="toggleCheckInGame(g.id)"
+                  class="game-chip-btn ripple-btn"
+                  [class.chip-selected]="isCheckInGameSelected(g.id)">
             <i class="pi mr-1" [ngClass]="isCheckInGameSelected(g.id) ? 'pi-check-circle' : 'pi-circle'"></i>
             <span>{{ g.name }}</span>
-          </div>
+          </button>
         </div>
       </div>
     </div>
     <ng-template pTemplate="footer">
-      <button (click)="showQuickCheckInDialog = false" class="p-button p-button-text p-button-secondary font-bold">إلغاء</button>
-      <button (click)="executeQuickCheckIn()" class="p-button p-button-success font-bold">تأكيد الدخول</button>
+      <button (click)="showQuickCheckInDialog = false" class="p-button p-button-outlined p-button-secondary font-bold">إلغاء</button>
+      <button (click)="executeQuickCheckIn()" class="p-button p-button-success font-bold">
+        <i class="pi pi-sign-in ml-1"></i>
+        <span>تأكيد الدخول</span>
+      </button>
     </ng-template>
   </p-dialog>
 </div>

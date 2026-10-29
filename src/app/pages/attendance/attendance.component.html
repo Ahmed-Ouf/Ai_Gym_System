@@ -103,21 +103,35 @@
           <span class="text-red-500">*</span>
         </label>
         
-        <div class="search-box-wrapper mb-2">
-          <i class="pi pi-search search-icon"></i>
-          <input 
-            type="text" 
-            [(ngModel)]="memberSearchTerm" 
-            placeholder="اكتب اسم العضو أو رقم هاتفه..." 
-            class="custom-search-input w-full" />
-        </div>
-
-        <select [(ngModel)]="selectedMemberId" class="custom-select w-full">
-          <option value="">-- اضغط للاختيار من القائمة ({{ searchedMembers.length }} عضو) --</option>
-          <option *ngFor="let m of searchedMembers" [value]="m.id">
-            {{ m.name }} - {{ m.phone }}
-          </option>
-        </select>
+        <p-dropdown 
+          [options]="activeMembers" 
+          [(ngModel)]="selectedMemberId" 
+          optionLabel="name" 
+          optionValue="id" 
+          [filter]="true" 
+          filterBy="name,phone" 
+          filterPlaceholder="ابحث بالاسم أو رقم الهاتف..."
+          [showClear]="true"
+          placeholder="-- ابحث بالاسم أو الهاتف أو اختر عضواً --"
+          appendTo="body"
+          styleClass="w-full custom-prime-dropdown font-bold">
+          <ng-template let-m pTemplate="item">
+            <div class="flex align-items-center gap-2 py-1">
+              <img [src]="getMemberAvatar(m.id)" class="dd-item-avatar" />
+              <div class="flex-1">
+                <div class="font-bold text-sm text-900">{{ m.name }}</div>
+                <div class="text-xs text-500 font-mono" dir="ltr">{{ m.phone }}</div>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template let-m pTemplate="selectedItem">
+            <div class="flex align-items-center gap-2" *ngIf="m">
+              <img [src]="getMemberAvatar(m.id)" class="dd-selected-avatar" />
+              <span class="font-bold text-sm text-900">{{ m.name }}</span>
+              <span class="text-xs text-500 font-mono" dir="ltr">({{ m.phone }})</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
 
         <!-- Selected Member Quick Card Preview -->
         <div *ngIf="selectedMemberObj" class="member-preview-card mt-3 animate-fadein">

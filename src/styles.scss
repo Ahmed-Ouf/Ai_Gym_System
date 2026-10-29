@@ -237,7 +237,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .p-dialog {
   border-radius: 18px;
-  overflow: hidden;
   direction: rtl;
   text-align: right;
   border: 1px solid #e2e8f0;
@@ -246,16 +245,54 @@ h1, h2, h3, h4, h5, h6 {
   .p-dialog-header {
     background: #f8fafc;
     border-bottom: 1px solid #e2e8f0;
-    padding: 1.25rem 1.75rem;
+    padding: 1.15rem 1.6rem;
     font-weight: 800;
+
+    .p-dialog-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.01em;
+    }
+
+    .p-dialog-header-icons {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+
+      .p-dialog-header-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 8px;
+        color: #64748b;
+        transition: all 0.15s ease;
+
+        &:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+      }
+    }
   }
+
   .p-dialog-content {
-    padding: 1.75rem;
+    padding: 1.6rem;
+    color: #1e293b;
   }
+
   .p-dialog-footer {
     background: #f8fafc;
     border-top: 1px solid #e2e8f0;
-    padding: 1rem 1.75rem;
+    padding: 1rem 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+
+    button {
+      margin: 0 !important; // Eliminates PrimeNG Lara LTR margin bug in RTL
+      min-width: 95px;
+    }
   }
 }
 
@@ -333,5 +370,206 @@ h1, h2, h3, h4, h5, h6 {
     padding: 1rem;
     background: #f8fafc;
     border-top: 1px solid #e2e8f0;
+  }
+}
+
+/* ==========================================================================
+   Searchable PrimeNG Dropdown Customization (RTL & Brand Styling)
+   ========================================================================== */
+p-dropdown,
+p-dropdown.p-element {
+  display: block;
+  width: 100%;
+}
+
+.p-fluid p-dropdown,
+.p-fluid p-dropdown.p-element {
+  display: block;
+  width: 100%;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  > label {
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* Dedicated Dropdown Avatars */
+.dd-selected-avatar {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  max-width: 26px !important;
+  max-height: 26px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.dd-item-avatar {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  border: 1.5px solid #e2e8f0 !important;
+}
+
+.p-dropdown {
+  width: 100%;
+  min-height: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-family) !important;
+  direction: rtl;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    border-color: #94a3b8;
+  }
+
+  &.p-focus, &:focus-within {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+  }
+
+  .p-dropdown-label {
+    font-family: var(--font-family) !important;
+    font-size: 0.875rem !important;
+    padding: 0 0.85rem !important;
+    padding-left: 4.5rem !important; /* Leave generous space for Clear (X) and Chevron (V) on the left */
+    text-align: right !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+
+    /* Absolute fallback protection so no image can ever blow up inside label */
+    img {
+      width: 26px !important;
+      height: 26px !important;
+      max-width: 26px !important;
+      max-height: 26px !important;
+      border-radius: 50% !important;
+      object-fit: cover !important;
+      flex-shrink: 0 !important;
+    }
+  }
+
+  .p-dropdown-trigger {
+    width: 2.25rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    order: 2;
+  }
+
+  .p-dropdown-clear-icon {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin-top: 0 !important;
+    right: auto !important;
+    left: 2.35rem !important; /* Neatly placed to the right of the chevron */
+    color: #94a3b8 !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.8rem !important;
+    cursor: pointer !important;
+    border-radius: 50% !important;
+    z-index: 3 !important;
+    transition: all 0.15s ease !important;
+
+    &:hover {
+      color: #ef4444 !important;
+      background: #fee2e2 !important;
+    }
+  }
+}
+
+.p-dropdown-panel {
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  border: 1px solid #e2e8f0;
+  direction: rtl;
+  font-family: var(--font-family) !important;
+  overflow: hidden;
+
+  .p-dropdown-header {
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+
+    .p-dropdown-filter-container {
+      width: 100%;
+
+      .p-dropdown-filter {
+        padding: 0.5rem 2rem 0.5rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        font-family: var(--font-family) !important;
+        font-size: 0.825rem;
+        width: 100%;
+        text-align: right;
+
+        &:focus {
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+        }
+      }
+
+      .p-dropdown-filter-icon {
+        right: 0.75rem;
+        left: auto;
+        color: #64748b;
+      }
+    }
+  }
+
+  .p-dropdown-items {
+    padding: 0.35rem;
+
+    .p-dropdown-item {
+      padding: 0.6rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      color: #1e293b;
+      margin-bottom: 2px;
+      transition: background 0.15s ease;
+
+      &:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+
+      &.p-highlight {
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 700;
+      }
+    }
   }
 }

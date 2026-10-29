@@ -62,6 +62,11 @@ export class PaymentsComponent implements OnInit {
     return m ? m.phone : '';
   }
 
+  getMemberAvatar(id: string): string {
+    const m = this.gymService.getMemberById(id);
+    return m?.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${id}`;
+  }
+
   goToSubscriptions(): void {
     this.router.navigate(['/subscriptions']);
   }

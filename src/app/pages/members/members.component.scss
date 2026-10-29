@@ -1,13 +1,329 @@
 .members-container {
   direction: rtl;
   text-align: right;
+  padding-bottom: 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.member-detail-body {
-  direction: rtl;
-  text-align: right;
+/* Header pill */
+.header-count-pill {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #3b82f6;
+  background: #eff6ff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  border: 1px solid #dbeafe;
 }
 
-.tab-btn {
-  border-radius: 8px;
+/* ==========================================================================
+   Filter Toolbar
+   ========================================================================== */
+.filter-toolbar {
+  .search-input-wrapper {
+    position: relative;
+
+    .search-icon {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+
+    .custom-search-input {
+      padding-right: 2.5rem;
+      padding-left: 1rem;
+      height: 2.6rem;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.85rem;
+      background: #f8fafc;
+      transition: all 0.2s;
+
+      &:focus {
+        background: #ffffff;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        outline: none;
+      }
+    }
+  }
+
+  .archive-toggle-label {
+    user-select: none;
+    .custom-checkbox {
+      accent-color: var(--primary-color);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+  }
+
+  .count-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+}
+
+/* ==========================================================================
+   Members Data Table
+   ========================================================================== */
+.members-table-card {
+  border: 1px solid #e2e8f0;
+
+  .member-archived {
+    opacity: 0.6;
+    background: #f8fafc;
+  }
+
+  .avatar-ring {
+    position: relative;
+    .member-table-avatar {
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 50%;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.05);
+      object-fit: cover;
+    }
+  }
+
+  .member-name-link {
+    transition: color 0.2s;
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  .member-code-badge {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-family: monospace;
+  }
+
+  .gender-age-chip {
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0.25rem 0.6rem;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .profile-action-btn {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+  }
+
+  .archive-action-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    &.btn-archive:hover {
+      background: #fef2f2;
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+
+    &.btn-unarchive:hover {
+      background: #f0fdf4;
+      color: #16a34a;
+      border-color: #bbf7d0;
+    }
+  }
+}
+
+/* ==========================================================================
+   Member Details Dialog
+   ========================================================================== */
+.dialog-avatar {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.segmented-tabs-bar {
+  .tab-item-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #64748b;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    &.active {
+      background: #eff6ff;
+      color: var(--primary-color);
+      border-color: #bfdbfe;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.08);
+    }
+  }
+}
+
+.info-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+
+  .info-card-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .info-card-val {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+}
+
+.notes-highlight-card {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+
+  .notes-title {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #1e40af;
+  }
+
+  .notes-body {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    line-height: 1.5;
+  }
+}
+
+/* Schedule */
+.schedule-highlight-box {
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid transparent;
+
+  &.highlight-today {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    .highlight-label {
+      color: #065f46;
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .highlight-val {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #064e3b;
+    }
+  }
+
+  &.highlight-tomorrow {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    .highlight-label {
+      color: #1e40af;
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .highlight-val {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #1e3a8a;
+    }
+  }
+}
+
+.day-routine-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.85rem;
+  transition: all 0.2s;
+
+  &.active-routine {
+    border-color: #3b82f6;
+    background: #f8fafc;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.08);
+  }
+}
+
+.schedule-editor-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.table-activity-chip {
+  background: #f1f5f9;
+  color: #334155;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.measurement-form-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
 }

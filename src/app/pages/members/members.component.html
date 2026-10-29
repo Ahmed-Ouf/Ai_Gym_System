@@ -1,92 +1,106 @@
 <div class="members-container">
   <!-- Feedback Notification -->
   <div *ngIf="alertMsg" 
-       class="mb-4 p-3 border-round flex align-items-center gap-2 shadow-2"
-       [ngClass]="alertSuccess ? 'bg-green-100 text-green-900 border-green-300' : 'bg-red-100 text-red-900 border-red-300'">
-    <i class="pi" [ngClass]="alertSuccess ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
-    <span class="font-bold text-sm">{{ alertMsg }}</span>
+       class="alert-toast flex align-items-center justify-content-between gap-3 shadow-3 animate-fadein mb-4"
+       [ngClass]="alertSuccess ? 'alert-success' : 'alert-danger'">
+    <div class="flex align-items-center gap-2">
+      <i class="pi text-xl" [ngClass]="alertSuccess ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
+      <span class="font-bold text-sm">{{ alertMsg }}</span>
+    </div>
+    <button (click)="alertMsg = null" class="close-toast-btn" title="إغلاق">
+      <i class="pi pi-times text-xs"></i>
+    </button>
   </div>
 
   <!-- Page Header -->
   <div class="page-header mb-4 flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-3">
     <div>
-      <h1 class="page-title text-3xl font-extrabold text-900 m-0">دليل أعضاء جيم الحلواني</h1>
-      <p class="page-subtitle text-sm text-600 m-0 mt-1">إدارة شاملة لملفات المشتركين، جداول التمارين الأسبوعية، والقياسات البدنية.</p>
+      <div class="flex align-items-center gap-2 mb-1">
+        <span class="gradient-badge">
+          <i class="pi pi-users"></i>
+          <span>الأعضاء الرياضيون</span>
+        </span>
+        <span class="header-count-pill font-tabular">{{ filteredMembers.length }} عضو</span>
+      </div>
+      <h1 class="page-title text-2xl lg:text-3xl font-extrabold text-900 m-0">دليل أبطال جيم الحلواني</h1>
+      <p class="page-subtitle text-xs text-600 m-0 mt-1">إدارة شاملة لملفات المشتركين، جداول التمارين الأسبوعية، وسجل القياسات والوزن البدني.</p>
     </div>
     <div>
-      <button (click)="openAddMember()" class="p-button p-button-primary ripple-btn flex align-items-center gap-2">
+      <button (click)="openAddMember()" class="p-button p-button-primary ripple-btn flex align-items-center gap-2 font-bold shadow-1">
         <i class="pi pi-user-plus"></i>
-        <span>تسجيل عضو جديد</span>
+        <span>تسجيل بطل جديد</span>
       </button>
     </div>
   </div>
 
   <!-- Filter & Search Toolbar -->
-  <div class="gym-card mb-4 py-3 px-4 flex flex-column sm:flex-row justify-content-between align-items-center gap-3">
-    <div class="p-inputgroup max-w-28rem w-full">
-      <span class="p-inputgroup-addon bg-white border-left-none">
-        <i class="pi pi-search text-500"></i>
-      </span>
+  <div class="gym-card filter-toolbar mb-4 py-3 px-4 flex flex-column sm:flex-row justify-content-between align-items-center gap-3">
+    <div class="search-input-wrapper max-w-28rem w-full">
+      <i class="pi pi-search search-icon"></i>
       <input 
         type="text" 
-        pInputText 
         placeholder="ابحث بالاسم، رقم الهاتف، أو كود العضو..." 
         [(ngModel)]="searchQuery" 
         (input)="applyFilter()" 
-        class="border-right-none w-full" />
+        class="custom-search-input w-full" />
     </div>
 
     <div class="flex align-items-center gap-3">
-      <label class="flex align-items-center gap-2 cursor-pointer text-xs font-bold text-700">
-        <input type="checkbox" [(ngModel)]="showArchived" (change)="applyFilter()" />
-        <span>عرض المؤرشفين</span>
+      <label class="archive-toggle-label flex align-items-center gap-2 cursor-pointer text-xs font-bold text-700">
+        <input type="checkbox" [(ngModel)]="showArchived" (change)="applyFilter()" class="custom-checkbox" />
+        <span>عرض الأعضاء المؤرشفين</span>
       </label>
-      <div class="text-xs font-bold text-600 bg-slate-100 py-2 px-3 border-round">
+      <div class="count-badge font-tabular">
         عرض {{ filteredMembers.length }} من {{ members.length }} عضو
       </div>
     </div>
   </div>
 
   <!-- Members Data Table -->
-  <div class="gym-card p-0 overflow-hidden shadow-2">
+  <div class="gym-card members-table-card p-0 overflow-hidden shadow-2">
     <p-table [value]="filteredMembers" [paginator]="true" [rows]="10" responsiveLayout="scroll" class="w-full">
       <ng-template pTemplate="header">
         <tr>
-          <th>بيانات العضو</th>
+          <th>بيانات البطل الرياضي</th>
           <th>كود العضو</th>
           <th>رقم الهاتف</th>
           <th>الجنس والعمر</th>
           <th>تاريخ الانضمام</th>
           <th>الحالة</th>
-          <th class="text-center">الإجراءات</th>
+          <th class="text-center" style="width: 170px">الإجراءات</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-member>
-        <tr [class.opacity-60]="member.isArchived">
+        <tr [class.member-archived]="member.isArchived">
           <td>
             <div class="flex align-items-center gap-3 cursor-pointer" (click)="openMemberDetails(member)">
-              <img [src]="member.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + member.id" 
-                   [alt]="member.name" 
-                   class="w-3rem h-3rem border-circle shadow-1" />
+              <div class="avatar-ring">
+                <img [src]="member.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + member.id" 
+                     [alt]="member.name" 
+                     class="member-table-avatar" />
+              </div>
               <div class="flex flex-column">
-                <span class="font-bold text-sm text-900 hover:text-primary transition-all">{{ member.name }}</span>
-                <span class="text-xs text-500">{{ member.notes || 'لا توجد ملاحظات' }}</span>
+                <span class="font-bold text-sm text-900 member-name-link">{{ member.name }}</span>
+                <span class="text-xs text-500">{{ member.notes || 'لا توجد ملاحظات إضافية' }}</span>
               </div>
             </div>
           </td>
           <td>
-            <span class="text-xs font-bold text-700 bg-slate-100 px-2 py-1 border-round">{{ member.id }}</span>
+            <span class="member-code-badge font-tabular">{{ member.id }}</span>
           </td>
           <td>
-            <span class="text-sm font-semibold text-800" dir="ltr">{{ member.phone }}</span>
+            <span class="text-sm font-bold text-800 font-tabular" dir="ltr">{{ member.phone }}</span>
           </td>
           <td>
-            <span class="text-xs font-bold">
-              {{ member.gender === 'Male' ? 'ذكر' : 'أنثى' }} • {{ calculateAge(member.birthDate) }} سنة
+            <span class="gender-age-chip">
+              <i class="pi" [ngClass]="member.gender === 'Male' ? 'pi-user text-blue-600' : 'pi-heart text-pink-500'"></i>
+              <span>{{ member.gender === 'Male' ? 'ذكر' : 'أنثى' }}</span>
+              <span>•</span>
+              <span class="font-tabular">{{ calculateAge(member.birthDate) }} سنة</span>
             </span>
           </td>
           <td>
-            <span class="text-xs text-600">{{ member.joinDate }}</span>
+            <span class="text-xs font-semibold text-600 font-tabular">{{ member.joinDate }}</span>
           </td>
           <td>
             <span class="status-badge" [ngClass]="member.isArchived ? 'expired' : 'active'">
@@ -95,13 +109,13 @@
           </td>
           <td class="text-center">
             <div class="flex justify-content-center gap-2">
-              <button (click)="openMemberDetails(member)" class="p-button p-button-sm p-button-primary flex align-items-center gap-1 text-xs">
-                <i class="pi pi-eye"></i>
+              <button (click)="openMemberDetails(member)" class="profile-action-btn ripple-btn">
+                <i class="pi pi-id-card"></i>
                 <span>الملف الكامل</span>
               </button>
               <button (click)="toggleArchive(member)" 
-                      class="p-button p-button-text p-button-sm"
-                      [ngClass]="member.isArchived ? 'p-button-success' : 'p-button-secondary'"
+                      class="archive-action-btn"
+                      [ngClass]="member.isArchived ? 'btn-unarchive' : 'btn-archive'"
                       [title]="member.isArchived ? 'إلغاء الأرشفة' : 'أرشفة العضو'">
                 <i class="pi" [ngClass]="member.isArchived ? 'pi-undo' : 'pi-inbox'"></i>
               </button>
@@ -111,7 +125,8 @@
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="7" class="text-center p-4 text-500 font-semibold">
+          <td colspan="7" class="text-center p-5 text-500 font-semibold">
+            <i class="pi pi-users text-3xl text-300 block mb-2"></i>
             لم يتم العثور على أي أعضاء تطابق معايير البحث.
           </td>
         </tr>
@@ -120,101 +135,108 @@
   </div>
 
   <!-- ==================== MEMBER DETAILS DIALOG ==================== -->
-  <p-dialog [(visible)]="showDetailDialog" [modal]="true" [style]="{width: '90vw', maxWidth: '1050px'}" [draggable]="false" [resizable]="false">
+  <p-dialog [(visible)]="showDetailDialog" [modal]="true" [style]="{width: '92vw', maxWidth: '1080px'}" [draggable]="false" [resizable]="false">
     <ng-template pTemplate="header">
       <div class="flex align-items-center gap-3" *ngIf="selectedMember">
         <img [src]="selectedMember.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + selectedMember.id" 
-             class="w-3rem h-3rem border-circle shadow-2" />
+             class="dialog-avatar" />
         <div>
-          <div class="text-xl font-bold text-900">{{ selectedMember.name }}</div>
-          <div class="text-xs text-600">كود: {{ selectedMember.id }} • هاتف: <span dir="ltr">{{ selectedMember.phone }}</span></div>
+          <div class="text-xl font-black text-900">{{ selectedMember.name }}</div>
+          <div class="text-xs text-600 mt-1 flex align-items-center gap-2">
+            <span class="member-code-badge font-tabular">كود: {{ selectedMember.id }}</span>
+            <span>•</span>
+            <span>الهاتف: <strong class="font-tabular" dir="ltr">{{ selectedMember.phone }}</strong></span>
+          </div>
         </div>
       </div>
     </ng-template>
 
     <div *ngIf="selectedMember" class="member-detail-body">
       <!-- Tabs Navigation Header -->
-      <div class="flex flex-wrap gap-2 border-bottom-1 border-200 pb-3 mb-4">
+      <div class="segmented-tabs-bar flex flex-wrap gap-2 border-bottom-1 border-100 pb-3 mb-4">
         <button (click)="activeDetailTab = 'profile'" 
-                class="tab-btn p-button p-button-sm text-xs font-bold"
-                [ngClass]="activeDetailTab === 'profile' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'">
-          <i class="pi pi-user mr-1"></i>
+                class="tab-item-btn"
+                [class.active]="activeDetailTab === 'profile'">
+          <i class="pi pi-user"></i>
           <span>الملف الشخصي</span>
         </button>
 
         <button (click)="activeDetailTab = 'subscriptions'" 
-                class="tab-btn p-button p-button-sm text-xs font-bold"
-                [ngClass]="activeDetailTab === 'subscriptions' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'">
-          <i class="pi pi-ticket mr-1"></i>
+                class="tab-item-btn"
+                [class.active]="activeDetailTab === 'subscriptions'">
+          <i class="pi pi-ticket"></i>
           <span>الاشتراكات ({{ memberSubscriptions.length }})</span>
         </button>
 
         <button (click)="activeDetailTab = 'schedule'" 
-                class="tab-btn p-button p-button-sm text-xs font-bold"
-                [ngClass]="activeDetailTab === 'schedule' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'">
-          <i class="pi pi-calendar mr-1"></i>
+                class="tab-item-btn"
+                [class.active]="activeDetailTab === 'schedule'">
+          <i class="pi pi-calendar"></i>
           <span>جدول التمارين الأسبوعي</span>
         </button>
 
         <button (click)="activeDetailTab = 'attendance'" 
-                class="tab-btn p-button p-button-sm text-xs font-bold"
-                [ngClass]="activeDetailTab === 'attendance' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'">
-          <i class="pi pi-clock mr-1"></i>
+                class="tab-item-btn"
+                [class.active]="activeDetailTab === 'attendance'">
+          <i class="pi pi-clock"></i>
           <span>سجل الحضور ({{ memberAttendances.length }})</span>
         </button>
 
         <button (click)="activeDetailTab = 'measurements'" 
-                class="tab-btn p-button p-button-sm text-xs font-bold"
-                [ngClass]="activeDetailTab === 'measurements' ? 'p-button-primary' : 'p-button-outlined p-button-secondary'">
-          <i class="pi pi-chart-line mr-1"></i>
+                class="tab-item-btn"
+                [class.active]="activeDetailTab === 'measurements'">
+          <i class="pi pi-chart-line"></i>
           <span>القياسات والوزن ({{ memberMeasurements.length }})</span>
         </button>
       </div>
 
       <!-- TAB 1: Profile Info -->
-      <div *ngIf="activeDetailTab === 'profile'" class="tab-content">
+      <div *ngIf="activeDetailTab === 'profile'" class="tab-content animate-fadein">
         <div class="grid">
           <div class="col-12 md:col-4">
-            <div class="p-3 bg-slate-50 border-round border-1 border-slate-200">
-              <span class="text-xs text-500 font-bold block mb-1">الجنس والعمر</span>
-              <span class="text-base font-bold text-900">{{ selectedMember.gender === 'Male' ? 'ذكر' : 'أنثى' }} ({{ calculateAge(selectedMember.birthDate) }} سنة)</span>
+            <div class="info-card">
+              <span class="info-card-label">الجنس والعمر</span>
+              <span class="info-card-val">{{ selectedMember.gender === 'Male' ? 'ذكر' : 'أنثى' }} ({{ calculateAge(selectedMember.birthDate) }} سنة)</span>
             </div>
           </div>
           <div class="col-12 md:col-4">
-            <div class="p-3 bg-slate-50 border-round border-1 border-slate-200">
-              <span class="text-xs text-500 font-bold block mb-1">تاريخ الميلاد</span>
-              <span class="text-base font-bold text-900">{{ selectedMember.birthDate }}</span>
+            <div class="info-card">
+              <span class="info-card-label">تاريخ الميلاد</span>
+              <span class="info-card-val font-tabular">{{ selectedMember.birthDate }}</span>
             </div>
           </div>
           <div class="col-12 md:col-4">
-            <div class="p-3 bg-slate-50 border-round border-1 border-slate-200">
-              <span class="text-xs text-500 font-bold block mb-1">تاريخ الانضمام لجيم الحلواني</span>
-              <span class="text-base font-bold text-900">{{ selectedMember.joinDate }}</span>
+            <div class="info-card">
+              <span class="info-card-label">تاريخ الانضمام لجيم الحلواني</span>
+              <span class="info-card-val font-tabular">{{ selectedMember.joinDate }}</span>
             </div>
           </div>
-          <div class="col-12 mt-3">
-            <div class="p-4 bg-blue-50 border-round border-1 border-blue-200">
-              <span class="text-xs text-blue-700 font-bold block mb-1">ملاحظات العضو وأهداف التدريب</span>
-              <p class="text-sm font-semibold text-blue-950 m-0">{{ selectedMember.notes || 'لا توجد ملاحظات إضافية مسجلة.' }}</p>
+          <div class="col-12 mt-2">
+            <div class="notes-highlight-card">
+              <span class="notes-title">
+                <i class="pi pi-info-circle ml-1"></i>
+                ملاحظات العضو وأهداف التدريب
+              </span>
+              <p class="notes-body m-0 mt-1">{{ selectedMember.notes || 'لا توجد ملاحظات أو أهداف مسجلة حتى الآن.' }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- TAB 2: Subscriptions -->
-      <div *ngIf="activeDetailTab === 'subscriptions'" class="tab-content">
+      <div *ngIf="activeDetailTab === 'subscriptions'" class="tab-content animate-fadein">
         <div class="flex justify-content-between align-items-center mb-3">
-          <h3 class="text-base font-bold text-900 m-0">سجل اشتراكات العضو</h3>
-          <button (click)="openAddMemberSubscription()" class="p-button p-button-sm p-button-success flex align-items-center gap-1">
+          <h3 class="text-base font-bold text-900 m-0">سجل اشتراكات البطل في الأنشطة</h3>
+          <button (click)="openAddMemberSubscription()" class="p-button p-button-sm p-button-success flex align-items-center gap-1 font-bold">
             <i class="pi pi-plus"></i>
             <span>إضافة اشتراك جديد</span>
           </button>
         </div>
 
-        <p-table [value]="memberSubscriptions" responsiveLayout="scroll">
+        <p-table [value]="memberSubscriptions" responsiveLayout="scroll" styleClass="p-datatable-striped">
           <ng-template pTemplate="header">
             <tr>
-              <th>اللعبة / النشاط</th>
+              <th>النشاط الرياضي</th>
               <th>نوع الخطة</th>
               <th>تاريخ البدء</th>
               <th>تاريخ الانتهاء</th>
@@ -225,16 +247,16 @@
           <ng-template pTemplate="body" let-sub>
             <tr>
               <td>
-                <span class="font-bold text-sm">{{ getGameName(sub.gameId) }}</span>
+                <span class="font-bold text-sm text-900">{{ getGameName(sub.gameId) }}</span>
               </td>
               <td>
-                <span class="text-xs bg-slate-100 text-slate-700 px-2 py-1 border-round font-semibold">
+                <span class="plan-badge" [ngClass]="sub.planType.toLowerCase()">
                   {{ getPlanTypeName(sub.planType) }}
                 </span>
               </td>
-              <td><span class="text-xs font-semibold text-700">{{ sub.startDate }}</span></td>
-              <td><span class="text-xs font-semibold text-700">{{ sub.endDate }}</span></td>
-              <td><span class="font-bold text-primary">{{ sub.price }} ج.م</span></td>
+              <td><span class="text-xs font-semibold text-700 font-tabular">{{ sub.startDate }}</span></td>
+              <td><span class="text-xs font-semibold text-700 font-tabular">{{ sub.endDate }}</span></td>
+              <td><span class="font-bold text-primary font-tabular">{{ sub.price }} ج.م</span></td>
               <td>
                 <span class="status-badge" [ngClass]="getSubscriptionStatusClass(sub)">
                   {{ getSubscriptionStatus(sub) }}
@@ -244,7 +266,7 @@
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="6" class="text-center p-3 text-500 font-semibold">
+              <td colspan="6" class="text-center p-4 text-500 font-semibold">
                 لا توجد اشتراكات مسجلة لهذا العضو بعد.
               </td>
             </tr>
@@ -253,27 +275,33 @@
       </div>
 
       <!-- TAB 3: Schedule -->
-      <div *ngIf="activeDetailTab === 'schedule'" class="tab-content">
+      <div *ngIf="activeDetailTab === 'schedule'" class="tab-content animate-fadein">
         <!-- Today & Tomorrow Highlights -->
         <div class="grid mb-4">
           <div class="col-12 md:col-6">
-            <div class="p-3 border-round border-1 border-green-300 bg-green-50">
-              <span class="text-xs font-bold text-green-700 block mb-1">جدول تمرين اليوم ({{ todaySchedule ? todaySchedule.dayName : 'اليوم' }})</span>
-              <div *ngIf="todaySchedule" class="font-bold text-base text-green-950">
+            <div class="schedule-highlight-box highlight-today">
+              <span class="highlight-label">
+                <i class="pi pi-bolt ml-1"></i>
+                جدول تمرين اليوم ({{ todaySchedule ? todaySchedule.dayName : 'اليوم' }})
+              </span>
+              <div *ngIf="todaySchedule" class="highlight-val">
                 {{ todaySchedule.gameName }} - {{ todaySchedule.trainingTypeName }}
               </div>
-              <div *ngIf="!todaySchedule" class="text-xs text-green-800">
+              <div *ngIf="!todaySchedule" class="text-xs text-emerald-800 font-semibold">
                 يوم راحة أو لم يتم تحديد تمرين لليوم.
               </div>
             </div>
           </div>
           <div class="col-12 md:col-6">
-            <div class="p-3 border-round border-1 border-blue-300 bg-blue-50">
-              <span class="text-xs font-bold text-blue-700 block mb-1">جدول تمرين الغد ({{ tomorrowSchedule ? tomorrowSchedule.dayName : 'غداً' }})</span>
-              <div *ngIf="tomorrowSchedule" class="font-bold text-base text-blue-950">
+            <div class="schedule-highlight-box highlight-tomorrow">
+              <span class="highlight-label">
+                <i class="pi pi-calendar ml-1"></i>
+                جدول تمرين الغد ({{ tomorrowSchedule ? tomorrowSchedule.dayName : 'غداً' }})
+              </span>
+              <div *ngIf="tomorrowSchedule" class="highlight-val">
                 {{ tomorrowSchedule.gameName }} - {{ tomorrowSchedule.trainingTypeName }}
               </div>
-              <div *ngIf="!tomorrowSchedule" class="text-xs text-blue-800">
+              <div *ngIf="!tomorrowSchedule" class="text-xs text-blue-800 font-semibold">
                 يوم راحة أو لم يتم تحديد تمرين للغد.
               </div>
             </div>
@@ -284,8 +312,8 @@
         <h4 class="text-sm font-bold text-900 mb-2">الجدول الأسبوعي الكامل (7 أيام):</h4>
         <div class="grid mb-4">
           <div class="col-12 sm:col-6 lg:col-3" *ngFor="let day of weekDays">
-            <div class="p-3 border-round border-1 bg-white shadow-1"
-                 [ngClass]="buildScheduleItem(day.id) ? 'border-primary' : 'border-200'">
+            <div class="day-routine-card"
+                 [class.active-routine]="buildScheduleItem(day.id)">
               <div class="flex justify-content-between align-items-center mb-1">
                 <span class="font-bold text-sm text-900">{{ day.name }}</span>
                 <span *ngIf="buildScheduleItem(day.id)" (click)="clearDaySchedule(day.id)" class="text-red-500 cursor-pointer text-xs" title="مسح">
@@ -303,33 +331,33 @@
           </div>
         </div>
 
-        <!-- Safe Schedule Editor (Editing one day does not delete other days) -->
-        <div class="p-4 border-round bg-slate-100 border-1 border-slate-300">
+        <!-- Safe Schedule Editor -->
+        <div class="schedule-editor-box p-4 border-round">
           <h4 class="text-sm font-bold text-900 mb-2">تعديل جدول يوم محدد (تعديل آمن لا يحذف باقي الأيام):</h4>
           <div class="grid">
             <div class="col-12 sm:col-4">
               <label class="text-xs font-bold text-700 block mb-1">اليوم المراد تعديله</label>
-              <select [(ngModel)]="editScheduleDay" (change)="onScheduleDayChange()" class="p-inputtext w-full">
+              <select [(ngModel)]="editScheduleDay" (change)="onScheduleDayChange()" class="p-inputtext w-full text-sm font-bold">
                 <option *ngFor="let d of weekDays" [value]="d.id">{{ d.name }}</option>
               </select>
             </div>
             <div class="col-12 sm:col-4">
-              <label class="text-xs font-bold text-700 block mb-1">اللعبة / النشاط</label>
-              <select [(ngModel)]="editScheduleGameId" class="p-inputtext w-full">
+              <label class="text-xs font-bold text-700 block mb-1">النشاط الرياضي</label>
+              <select [(ngModel)]="editScheduleGameId" class="p-inputtext w-full text-sm font-semibold">
                 <option *ngFor="let g of games" [value]="g.id">{{ g.name }}</option>
               </select>
             </div>
             <div class="col-12 sm:col-4">
               <label class="text-xs font-bold text-700 block mb-1">نوع / عضلة التمرين</label>
-              <select [(ngModel)]="editScheduleTypeId" class="p-inputtext w-full">
+              <select [(ngModel)]="editScheduleTypeId" class="p-inputtext w-full text-sm font-semibold">
                 <option [ngValue]="null">-- تمرين عام بدون تحديد --</option>
                 <option *ngFor="let t of getTrainingTypesForGame(editScheduleGameId)" [value]="t.id">{{ t.name }}</option>
               </select>
             </div>
           </div>
           <div class="mt-3 text-left">
-            <button (click)="saveDaySchedule()" class="p-button p-button-sm p-button-primary">
-              <i class="pi pi-save mr-1"></i>
+            <button (click)="saveDaySchedule()" class="p-button p-button-sm p-button-primary font-bold">
+              <i class="pi pi-check ml-1"></i>
               <span>حفظ جدول اليوم بأمان</span>
             </button>
           </div>
@@ -337,9 +365,9 @@
       </div>
 
       <!-- TAB 4: Attendance History -->
-      <div *ngIf="activeDetailTab === 'attendance'" class="tab-content">
+      <div *ngIf="activeDetailTab === 'attendance'" class="tab-content animate-fadein">
         <h3 class="text-base font-bold text-900 mb-3">سجل حضور وانصراف العضو في جيم الحلواني</h3>
-        <p-table [value]="memberAttendances" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+        <p-table [value]="memberAttendances" [paginator]="true" [rows]="5" responsiveLayout="scroll" styleClass="p-datatable-striped">
           <ng-template pTemplate="header">
             <tr>
               <th>تاريخ الجلسة</th>
@@ -351,11 +379,11 @@
           </ng-template>
           <ng-template pTemplate="body" let-att>
             <tr>
-              <td><span class="text-xs font-bold text-800">{{ formatDate(att.checkIn) }}</span></td>
-              <td><span class="text-xs font-bold text-green-700">{{ formatTime(att.checkIn) }}</span></td>
-              <td><span class="text-xs font-bold text-slate-700">{{ formatTime(att.checkOut) }}</span></td>
+              <td><span class="text-xs font-bold text-800 font-tabular">{{ formatDate(att.checkIn) }}</span></td>
+              <td><span class="text-xs font-bold text-green-700 font-tabular">{{ formatTime(att.checkIn) }}</span></td>
+              <td><span class="text-xs font-bold text-slate-700 font-tabular">{{ formatTime(att.checkOut) }}</span></td>
               <td>
-                <span class="text-xs bg-slate-100 text-slate-800 px-2 py-1 border-round font-medium">
+                <span class="table-activity-chip">
                   {{ (att.gameIds && att.gameIds.length > 0) ? att.gameIds.join(', ') : 'نشاط عام' }}
                 </span>
               </td>
@@ -368,7 +396,7 @@
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="5" class="text-center p-3 text-500 font-semibold">
+              <td colspan="5" class="text-center p-4 text-500 font-semibold">
                 لا توجد سجلات حضور سابقة لهذا العضو.
               </td>
             </tr>
@@ -377,26 +405,26 @@
       </div>
 
       <!-- TAB 5: Measurements -->
-      <div *ngIf="activeDetailTab === 'measurements'" class="tab-content">
+      <div *ngIf="activeDetailTab === 'measurements'" class="tab-content animate-fadein">
         <div class="grid">
           <!-- Form to add measurement -->
           <div class="col-12 lg:col-5">
-            <div class="p-4 bg-slate-50 border-round border-1 border-slate-200">
+            <div class="measurement-form-card p-4 border-round">
               <h4 class="text-sm font-bold text-900 mb-3">تسجيل قياس ووزن جديد</h4>
               <div class="field mb-3">
                 <label class="text-xs font-bold text-700 block mb-1">الوزن الحالي (كجم) *</label>
-                <input type="number" pInputText [(ngModel)]="newWeight" step="0.1" class="w-full font-bold" />
+                <input type="number" pInputText [(ngModel)]="newWeight" step="0.1" class="w-full font-bold font-tabular text-base" />
               </div>
               <div class="field mb-3">
                 <label class="text-xs font-bold text-700 block mb-1">تاريخ القياس *</label>
-                <input type="date" pInputText [(ngModel)]="newMeasurementDate" class="w-full" />
+                <input type="date" pInputText [(ngModel)]="newMeasurementDate" class="w-full text-sm" />
               </div>
               <div class="field mb-3">
                 <label class="text-xs font-bold text-700 block mb-1">ملاحظات القياس (تضخيم، تنشيف، نسبة دهون...)</label>
-                <input type="text" pInputText [(ngModel)]="newMeasurementNotes" placeholder="مثال: بعد أسبوع دايت..." class="w-full" />
+                <input type="text" pInputText [(ngModel)]="newMeasurementNotes" placeholder="مثال: بعد أسبوع دايت..." class="w-full text-sm" />
               </div>
-              <button (click)="saveMeasurement()" class="p-button p-button-sm p-button-primary w-full">
-                <i class="pi pi-plus mr-1"></i>
+              <button (click)="saveMeasurement()" class="p-button p-button-sm p-button-primary w-full font-bold">
+                <i class="pi pi-plus ml-1"></i>
                 <span>تسجيل القياس</span>
               </button>
             </div>
@@ -405,7 +433,7 @@
           <!-- Measurements Table -->
           <div class="col-12 lg:col-7">
             <h4 class="text-sm font-bold text-900 mb-2">تاريخ الأوزان والقياسات:</h4>
-            <p-table [value]="memberMeasurements" responsiveLayout="scroll">
+            <p-table [value]="memberMeasurements" responsiveLayout="scroll" styleClass="p-datatable-striped">
               <ng-template pTemplate="header">
                 <tr>
                   <th>التاريخ</th>
@@ -416,8 +444,8 @@
               </ng-template>
               <ng-template pTemplate="body" let-mea>
                 <tr>
-                  <td><span class="text-xs font-bold text-800">{{ mea.date }}</span></td>
-                  <td><span class="font-bold text-primary">{{ mea.weight }} كجم</span></td>
+                  <td><span class="text-xs font-bold text-800 font-tabular">{{ mea.date }}</span></td>
+                  <td><span class="font-bold text-primary font-tabular">{{ mea.weight }} كجم</span></td>
                   <td><span class="text-xs text-600">{{ mea.notes || '--' }}</span></td>
                   <td class="text-center">
                     <button (click)="deleteMeasurement(mea.id)" class="p-button p-button-text p-button-danger p-button-sm">
@@ -428,7 +456,7 @@
               </ng-template>
               <ng-template pTemplate="emptymessage">
                 <tr>
-                  <td colspan="4" class="text-center p-3 text-500 font-semibold">
+                  <td colspan="4" class="text-center p-4 text-500 font-semibold">
                     لا توجد قياسات مسجلة بعد.
                   </td>
                 </tr>
@@ -441,83 +469,37 @@
   </p-dialog>
 
   <!-- ==================== ADD MEMBER DIALOG ==================== -->
-  <p-dialog [(visible)]="showAddDialog" [modal]="true" header="تسجيل عضو جديد" [style]="{width: '500px'}">
+  <p-dialog [(visible)]="showAddDialog" [modal]="true" header="تسجيل بطل جديد في جيم الحلواني" [style]="{width: '520px'}">
     <div class="p-fluid">
       <div class="field mb-3">
-        <label class="font-bold text-sm mb-1 block">اسم العضو بالكامل *</label>
-        <input type="text" pInputText [(ngModel)]="newMemberName" placeholder="مثال: أحمد محمود الحلواني" class="w-full" />
+        <label class="font-bold text-xs text-700 mb-1 block">اسم العضو بالكامل *</label>
+        <input type="text" pInputText [(ngModel)]="newMemberName" placeholder="مثال: أحمد محمود الحلواني" class="w-full text-sm" />
       </div>
       <div class="field mb-3">
-        <label class="font-bold text-sm mb-1 block">رقم الهاتف / الواتساب *</label>
-        <input type="text" pInputText [(ngModel)]="newMemberPhone" placeholder="010XXXXXXXX" class="w-full" />
+        <label class="font-bold text-xs text-700 mb-1 block">رقم الهاتف / الواتساب *</label>
+        <input type="text" pInputText [(ngModel)]="newMemberPhone" placeholder="010XXXXXXXX" class="w-full text-sm" />
       </div>
       <div class="grid">
         <div class="col-6">
-          <label class="font-bold text-sm mb-1 block">الجنس *</label>
-          <select [(ngModel)]="newMemberGender" class="p-inputtext w-full">
+          <label class="font-bold text-xs text-700 mb-1 block">الجنس *</label>
+          <select [(ngModel)]="newMemberGender" class="p-inputtext w-full text-sm font-semibold">
             <option value="Male">ذكر</option>
             <option value="Female">أنثى</option>
           </select>
         </div>
         <div class="col-6">
-          <label class="font-bold text-sm mb-1 block">تاريخ الميلاد *</label>
-          <input type="date" pInputText [(ngModel)]="newMemberBirthDate" class="w-full" />
+          <label class="font-bold text-xs text-700 mb-1 block">تاريخ الميلاد *</label>
+          <input type="date" pInputText [(ngModel)]="newMemberBirthDate" class="w-full text-sm" />
         </div>
       </div>
       <div class="field mb-3 mt-2">
-        <label class="font-bold text-sm mb-1 block">تاريخ الانضمام *</label>
-        <input type="date" pInputText [(ngModel)]="newMemberJoinDate" class="w-full" />
-      </div>
-      <div class="field mb-3">
-        <label class="font-bold text-sm mb-1 block">ملاحظات وأهداف التدريب</label>
-        <textarea pInputText [(ngModel)]="newMemberNotes" rows="2" placeholder="أي حالات خاصة، مواعيد مفضلة..." class="w-full p-2"></textarea>
+        <label class="font-bold text-xs text-700 mb-1 block">ملاحظات أو أهداف التدريب</label>
+        <textarea pInputText [(ngModel)]="newMemberNotes" rows="2" placeholder="أهداف التدريب، كابتن المتابعة، أي إصابات..." class="w-full p-2 text-sm"></textarea>
       </div>
     </div>
     <ng-template pTemplate="footer">
-      <button (click)="showAddDialog = false" class="p-button p-button-text p-button-secondary">إلغاء</button>
-      <button (click)="saveNewMember()" class="p-button p-button-primary">حفظ العضو</button>
-    </ng-template>
-  </p-dialog>
-
-  <!-- ==================== ADD MEMBER SUBSCRIPTION DIALOG ==================== -->
-  <p-dialog [(visible)]="showAddMemberSubDialog" [modal]="true" header="إضافة اشتراك جديد للعضو" [style]="{width: '500px'}">
-    <div class="p-fluid" *ngIf="selectedMember">
-      <div class="field mb-3">
-        <label class="font-bold text-sm mb-1 block">العضو</label>
-        <div class="p-2 bg-slate-100 border-round font-bold text-sm">{{ selectedMember.name }} ({{ selectedMember.phone }})</div>
-      </div>
-      <div class="field mb-3">
-        <label class="font-bold text-sm mb-1 block">اللعبة / النشاط *</label>
-        <select [(ngModel)]="subGameId" (change)="onSubGameChange()" class="p-inputtext w-full">
-          <option *ngFor="let g of games" [value]="g.id">{{ g.name }} ({{ g.defaultPrice }} ج.م)</option>
-        </select>
-      </div>
-      <div class="field mb-3">
-        <label class="font-bold text-sm mb-1 block">نوع الخطة *</label>
-        <select [(ngModel)]="subPlanType" (change)="calculateSubEndDate()" class="p-inputtext w-full">
-          <option value="Monthly">شهري (شهر واحد)</option>
-          <option value="Quarterly">ربع سنوي (3 أشهر)</option>
-          <option value="Yearly">سنوي (12 شهر)</option>
-        </select>
-      </div>
-      <div class="grid mb-2">
-        <div class="col-6">
-          <label class="font-bold text-sm mb-1 block">تاريخ البدء *</label>
-          <input type="date" pInputText [(ngModel)]="subStartDate" (change)="calculateSubEndDate()" class="w-full" />
-        </div>
-        <div class="col-6">
-          <label class="font-bold text-sm mb-1 block">تاريخ الانتهاء *</label>
-          <input type="date" pInputText [(ngModel)]="subEndDate" class="w-full" />
-        </div>
-      </div>
-      <div class="field mb-3">
-        <label class="font-bold text-sm mb-1 block">سعر الاشتراك (ج.م) *</label>
-        <input type="number" pInputText [(ngModel)]="subPrice" min="0" class="w-full" />
-      </div>
-    </div>
-    <ng-template pTemplate="footer">
-      <button (click)="showAddMemberSubDialog = false" class="p-button p-button-text p-button-secondary">إلغاء</button>
-      <button (click)="saveMemberSubscription()" class="p-button p-button-primary">تأكيد الاشتراك</button>
+      <button (click)="showAddDialog = false" class="p-button p-button-text p-button-secondary font-bold">إلغاء</button>
+      <button (click)="saveNewMember()" class="p-button p-button-primary font-bold">تسجيل العضو</button>
     </ng-template>
   </p-dialog>
 </div>

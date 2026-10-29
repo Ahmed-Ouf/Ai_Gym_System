@@ -1,33 +1,39 @@
-<div class="payments-page-container" style="direction: rtl; text-align: right;">
+<div class="payments-page-container">
+  <!-- Page Header -->
   <div class="page-header mb-4 flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-3">
     <div>
-      <h1 class="text-3xl font-extrabold text-900 m-0">سجل الإيرادات والمدفوعات</h1>
-      <p class="text-sm text-600 m-0 mt-1">عرض وتدقيق المعاملات المالية وفواتير المشتركين.</p>
+      <div class="flex align-items-center gap-2 mb-1">
+        <span class="gradient-badge">
+          <i class="pi pi-wallet"></i>
+          <span>الخزينة والتحصيل</span>
+        </span>
+        <span class="header-count-pill font-tabular">{{ filteredPayments.length }} إيصال</span>
+      </div>
+      <h1 class="page-title text-2xl lg:text-3xl font-extrabold text-900 m-0">سجل الإيرادات والمدفوعات</h1>
+      <p class="page-subtitle text-xs text-600 m-0 mt-1">عرض وتدقيق المعاملات المالية وفواتير المشتركين المحصلة في الصالة الرياضية.</p>
     </div>
     <div>
-      <button (click)="goToSubscriptions()" class="p-button p-button-primary">
-        <i class="pi pi-ticket mr-1"></i>
+      <button (click)="goToSubscriptions()" class="p-button p-button-primary ripple-btn flex align-items-center gap-2 font-bold shadow-1">
+        <i class="pi pi-ticket"></i>
         <span>إدارة الاشتراكات والتحصيل</span>
       </button>
     </div>
   </div>
 
-  <div class="gym-card mb-4 py-3 px-4 flex flex-column sm:flex-row justify-content-between align-items-center gap-3">
-    <div class="p-inputgroup max-w-28rem w-full">
-      <span class="p-inputgroup-addon bg-white border-left-none">
-        <i class="pi pi-search text-500"></i>
-      </span>
+  <!-- Filter Toolbar -->
+  <div class="gym-card filter-toolbar mb-4 py-3 px-4 flex flex-column sm:flex-row justify-content-between align-items-center gap-3">
+    <div class="search-input-wrapper max-w-28rem w-full">
+      <i class="pi pi-search search-icon"></i>
       <input 
         type="text" 
-        pInputText 
         placeholder="ابحث بالاسم، الهاتف، أو رقم الإيصال..." 
         [(ngModel)]="searchQuery" 
         (input)="applyFilter()" 
-        class="border-right-none w-full" />
+        class="custom-search-input w-full" />
     </div>
 
-    <div class="flex align-items-center gap-2">
-      <select [(ngModel)]="selectedMethod" (change)="applyFilter()" class="p-inputtext py-2 px-3 text-xs border-round font-bold">
+    <div class="flex align-items-center gap-3">
+      <select [(ngModel)]="selectedMethod" (change)="applyFilter()" class="custom-select-method">
         <option value="ALL">جميع طرق الدفع</option>
         <option value="Cash">نقدي (كاش)</option>
         <option value="Visa">بطاقة / فيزا</option>
@@ -35,13 +41,14 @@
     </div>
   </div>
 
+  <!-- Payments Table -->
   <div class="gym-card p-0 overflow-hidden shadow-2">
-    <p-table [value]="filteredPayments" [paginator]="true" [rows]="10" responsiveLayout="scroll">
+    <p-table [value]="filteredPayments" [paginator]="true" [rows]="10" responsiveLayout="scroll" styleClass="p-datatable-striped">
       <ng-template pTemplate="header">
         <tr>
-          <th>رقم الإيصال</th>
-          <th>العضو</th>
-          <th>الاشتراك</th>
+          <th style="width: 110px">رقم الإيصال</th>
+          <th>العضو الرياضي</th>
+          <th>الاشتراك المرتبط</th>
           <th>المبلغ المسدد</th>
           <th>تاريخ الدفعة</th>
           <th>طريقة السداد</th>
@@ -50,20 +57,40 @@
       </ng-template>
       <ng-template pTemplate="body" let-p>
         <tr>
-          <td><span class="text-xs font-bold text-700 bg-slate-100 px-2 py-1 border-round">{{ p.id }}</span></td>
           <td>
-            <span class="font-bold text-sm text-900">{{ getMemberName(p.memberId) }}</span>
-            <span class="text-xs text-500 block" dir="ltr">{{ getMemberPhone(p.memberId) }}</span>
+            <span class="session-id-badge font-tabular">{{ p.id }}</span>
           </td>
-          <td><span class="text-xs text-700 font-semibold">{{ p.subscriptionId }}</span></td>
-          <td><span class="font-bold text-base text-green-600">{{ p.amount }} ج.م</span></td>
-          <td><span class="text-xs text-700 font-semibold">{{ p.date }}</span></td>
+          <td>
+            <div class="flex align-items-center gap-2">
+              <img [src]="getMemberAvatar(p.memberId)" class="table-avatar" />
+              <div>
+                <span class="font-bold text-sm text-900 block">{{ getMemberName(p.memberId) }}</span>
+                <span class="text-xs text-500 font-tabular font-mono" dir="ltr">{{ getMemberPhone(p.memberId) }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 border-round font-tabular">{{ p.subscriptionId }}</span>
+          </td>
+          <td>
+            <span class="font-black text-base text-emerald-600 font-tabular">{{ p.amount }} ج.م</span>
+          </td>
+          <td><span class="text-xs text-700 font-semibold font-tabular">{{ p.date }}</span></td>
           <td>
             <span class="status-badge" [ngClass]="p.method === 'Cash' ? 'active' : 'upcoming'">
-              {{ p.method === 'Cash' ? 'نقدي' : 'فيزا' }}
+              <i class="pi" [ngClass]="p.method === 'Cash' ? 'pi-money-bill' : 'pi-credit-card'"></i>
+              <span>{{ p.method === 'Cash' ? 'نقدي (كاش)' : 'بطاقة (فيزا)' }}</span>
             </span>
           </td>
-          <td><span class="text-xs text-600">{{ p.notes || '--' }}</span></td>
+          <td><span class="text-xs text-600">{{ p.notes || 'سداد اشتراك' }}</span></td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center p-5 text-500 font-semibold">
+            <i class="pi pi-wallet text-3xl text-300 block mb-2"></i>
+            لا توجد مدفوعات مسجلة تطابق البحث.
+          </td>
         </tr>
       </ng-template>
     </p-table>

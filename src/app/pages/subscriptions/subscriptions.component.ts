@@ -33,10 +33,7 @@ import { DropdownModule } from 'primeng/dropdown';
   styleUrls: ['./subscriptions.component.scss']
 })
 export class SubscriptionsComponent implements OnInit {
-  get activeMembers(): Member[] {
-    return this.members.filter(m => !m.isArchived);
-  }
-
+  activeMembers: Member[] = [];
   members: Member[] = [];
   games: Game[] = [];
   subscriptions: Subscription[] = [];
@@ -88,6 +85,7 @@ export class SubscriptionsComponent implements OnInit {
 
     this.gymService.members$.subscribe(data => {
       this.members = data;
+      this.activeMembers = data.filter(m => !m.isArchived);
     });
 
     this.gymService.games$.subscribe(data => {

@@ -70,6 +70,7 @@ export class AttendanceComponent implements OnInit {
     // Reactive subscriptions
     this.gymService.members$.subscribe(data => {
       this.members = data;
+      this.activeMembers = data.filter(m => !m.isArchived);
     });
 
     this.gymService.games$.subscribe(data => {
@@ -111,9 +112,7 @@ export class AttendanceComponent implements OnInit {
       });
   }
 
-  get activeMembers(): Member[] {
-    return this.members.filter(m => !m.isArchived);
-  }
+  activeMembers: Member[] = [];
 
   // Filterable member list for check-in
   get searchedMembers(): Member[] {

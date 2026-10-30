@@ -1,0 +1,181 @@
+<div class="wizard-container">
+  <!-- Top Navigation & Stepper -->
+  <div class="wizard-header mb-3">
+    <a routerLink="/simple" class="back-link">
+      <i class="pi pi-arrow-right"></i>
+      <span>الرئيسية</span>
+    </a>
+    <div class="step-indicator font-bold">
+      <span *ngIf="step === 1">الخطوة 1 من 2: اختيار اللاعب</span>
+      <span *ngIf="step === 2">الخطوة 2 من 2: تأكيد العملية</span>
+      <span *ngIf="step === 3">تمت العملية بنجاح ✅</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: Search and Pick Member -->
+  <div *ngIf="step === 1" class="wizard-card animate-fadein">
+    <div class="wizard-card-header">
+      <h1 class="wizard-title m-0">تسجيل حضور لاعب</h1>
+      <p class="wizard-subtitle m-0 mt-1">ابحث باسم اللاعب أو رقم هاتفه:</p>
+    </div>
+
+    <!-- Big Search Box -->
+    <div class="search-input-wrapper mb-3">
+      <i class="pi pi-search search-icon"></i>
+      <input type="text" 
+             [(ngModel)]="searchQuery" 
+             placeholder="اكتب اسم اللاعب أو رقم التليفون هنا..." 
+             class="big-search-box"
+             autofocus />
+      <button *ngIf="searchQuery" (click)="searchQuery = ''" class="clear-search-btn">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <!-- Members Results List -->
+    <div class="members-results-stack">
+      <div *ngFor="let m of filteredMembers" 
+           (click)="selectMember(m)"
+           class="member-select-card ripple-btn">
+        <img [src]="m.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + m.id" class="member-avatar" />
+        <div class="member-details">
+          <div class="member-name">{{ m.name }}</div>
+          <div class="member-phone font-mono" dir="ltr">{{ m.phone }}</div>
+        </div>
+        <i class="pi pi-angle-left select-chevron"></i>
+      </div>
+
+      <div *ngIf="filteredMembers.length === 0" class="no-results-box p-4 text-center">
+        <i class="pi pi-user-times text-3xl text-400 block mb-2"></i>
+        <div class="font-bold text-sm text-700">لم نعثر على أي لاعب بهذا الاسم أو الرقم</div>
+        <div class="mt-3">
+          <a routerLink="/simple/new-member" class="btn-create-member-link">
+            <i class="pi pi-user-plus ml-1"></i>
+            <span>تسجيل كلاعب جديد الآن</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Status & Action -->
+  <div *ngIf="step === 2 && selectedMember" class="wizard-card animate-fadein">
+    <div class="flex align-items-center justify-content-between mb-3 pb-2 border-bottom-1 border-100">
+      <button type="button" class="btn-back-step" (click)="step = 1">
+        <i class="pi pi-arrow-right ml-1"></i>
+        <span>تغيير اللاعب</span>
+      </button>
+      <span class="font-bold text-xs text-500">مراجعة الحالة</span>
+    </div>
+
+    <!-- Selected Member Header Profile -->
+    <div class="selected-member-banner mb-3">
+      <img [src]="selectedMember.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + selectedMember.id" class="big-avatar" />
+      <div>
+        <h2 class="m-0 font-bold text-lg text-900">{{ selectedMember.name }}</h2>
+        <span class="text-xs text-500 font-mono" dir="ltr">{{ selectedMember.phone }}</span>
+      </div>
+    </div>
+
+    <!-- Live Status Card -->
+    <div class="status-summary-card mb-4" [ngClass]="statusType">
+      <div class="flex align-items-center gap-3">
+        <i class="status-icon pi" [ngClass]="{
+          'pi-check-circle': statusType === 'valid',
+          'pi-exclamation-triangle': statusType === 'inside',
+          'pi-times-circle': statusType === 'expired' || statusType === 'no-sub'
+        }"></i>
+        <div>
+          <div class="status-title font-bold text-base">
+            <span *ngIf="statusType === 'valid'">اشتراك ساري وصالح للدخول ✅</span>
+            <span *ngIf="statusType === 'inside'">اللاعب داخل الصالة حالياً ⚠️</span>
+            <span *ngIf="statusType === 'expired'">الاشتراك منتهي 🔴</span>
+            <span *ngIf="statusType === 'no-sub'">لا يوجد اشتراك مسجل ⚠️</span>
+          </div>
+          <div class="status-desc text-xs mt-1 font-semibold">{{ statusText }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sport Selection (If Valid) -->
+    <div *ngIf="statusType === 'valid'" class="activities-box mb-4">
+      <label class="block font-bold text-xs text-700 mb-2">رياضة التمرين اليوم:</label>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" 
+                *ngFor="let g of activeGames" 
+                (click)="toggleGame(g.id)"
+                class="simple-chip-btn"
+                [class.chip-active]="isGameSelected(g.id)">
+          <i class="pi ml-1" [ngClass]="isGameSelected(g.id) ? 'pi-check-circle' : 'pi-circle'"></i>
+          <span>{{ g.name }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- What will happen plain sentence -->
+    <div class="action-preview-sentence mb-4" *ngIf="statusType === 'valid'">
+      <i class="pi pi-info-circle ml-1"></i>
+      <span>هتسجل دخول <strong>{{ selectedMember.name }}</strong> للتدريب في الصالة الآن.</span>
+    </div>
+
+    <!-- Big Action Buttons According to Status -->
+    <div class="actions-stack">
+      <!-- 1. Valid: Check-in -->
+      <button *ngIf="statusType === 'valid'" 
+              type="button" 
+              class="btn-giant btn-success ripple-btn"
+              (click)="executeCheckIn()">
+        <i class="pi pi-sign-in ml-2"></i>
+        <span>سجّل دخول الآن</span>
+      </button>
+
+      <!-- 2. Already Inside: Check-out -->
+      <button *ngIf="statusType === 'inside'" 
+              type="button" 
+              class="btn-giant btn-danger ripple-btn"
+              (click)="executeCheckOut()">
+        <i class="pi pi-sign-out ml-2"></i>
+        <span>سجّل خروج اللاعب من الصالة</span>
+      </button>
+
+      <!-- 3. Expired: Renew Shortcut -->
+      <button *ngIf="statusType === 'expired'" 
+              type="button" 
+              class="btn-giant btn-amber ripple-btn"
+              (click)="goToRenew()">
+        <i class="pi pi-refresh ml-2"></i>
+        <span>تجديد الاشتراك فوراً</span>
+      </button>
+
+      <!-- 4. No Sub: New Sub Shortcut -->
+      <button *ngIf="statusType === 'no-sub'" 
+              type="button" 
+              class="btn-giant btn-purple ripple-btn"
+              (click)="goToNewSub()">
+        <i class="pi pi-ticket ml-2"></i>
+        <span>عمل اشتراك جديد للاعب</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Done Success State -->
+  <div *ngIf="step === 3" class="wizard-card text-center p-4 animate-fadein">
+    <div class="success-icon-pod mb-3">
+      <i class="pi pi-check text-4xl"></i>
+    </div>
+    <h2 class="text-xl font-black text-900 m-0 mb-2">تمت العملية بنجاح!</h2>
+    <p class="text-sm text-600 font-bold m-0 mb-4">{{ successMessage }}</p>
+
+    <div class="flex flex-column sm:flex-row gap-2 justify-content-center">
+      <button type="button" class="btn-giant btn-primary" (click)="reset()">
+        <i class="pi pi-plus ml-1"></i>
+        <span>تسجيل لاعب آخر</span>
+      </button>
+      <a routerLink="/simple" class="btn-giant btn-secondary text-center text-decoration-none">
+        <i class="pi pi-home ml-1"></i>
+        <span>العودة للرئيسية</span>
+      </a>
+    </div>
+  </div>
+</div>
+

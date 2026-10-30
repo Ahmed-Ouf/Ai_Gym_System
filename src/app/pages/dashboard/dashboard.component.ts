@@ -25,9 +25,7 @@ import { DropdownModule } from 'primeng/dropdown';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
-  get activeMembers(): Member[] {
-    return this.members.filter(m => !m.isArchived);
-  }
+  activeMembers: Member[] = [];
 
   getMemberAvatar(memberId: string): string {
     const m = this.gymService.getMemberById(memberId);
@@ -112,6 +110,7 @@ export class DashboardComponent implements OnInit {
     // Reactive subscriptions
     this.gymService.members$.subscribe(data => {
       this.members = data;
+      this.activeMembers = data.filter(m => !m.isArchived);
       this.recalculateDashboard();
     });
 

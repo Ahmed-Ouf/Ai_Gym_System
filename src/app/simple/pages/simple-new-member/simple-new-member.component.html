@@ -1,0 +1,164 @@
+<div class="wizard-container">
+  <!-- Top Navigation & Stepper -->
+  <div class="wizard-header mb-3">
+    <a routerLink="/simple" class="back-link">
+      <i class="pi pi-arrow-right"></i>
+      <span>الرئيسية</span>
+    </a>
+    <div class="step-indicator font-bold">
+      <span *ngIf="step === 1">الخطوة 1 من 2: بيانات اللاعب</span>
+      <span *ngIf="step === 2">الخطوة 2 من 2: مراجعة وتأكيد</span>
+      <span *ngIf="step === 3">تم تسجيل البطل بنجاح 🎉</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: Short Android Form -->
+  <div *ngIf="step === 1" class="wizard-card animate-fadein">
+    <div class="wizard-card-header">
+      <h1 class="wizard-title m-0">تسجيل بطل جديد في جيم الحلواني</h1>
+      <p class="wizard-subtitle m-0 mt-1">املا البيانات الأساسية دي بس عشان تبدأ معاه:</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-banner mb-3">
+      <i class="pi pi-exclamation-circle ml-1"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form (ngSubmit)="goToConfirmation()">
+      <!-- Full Name -->
+      <div class="field-box mb-3">
+        <label class="field-label">اسم اللاعب بالكامل *</label>
+        <input type="text" 
+               [(ngModel)]="name" 
+               name="name"
+               placeholder="مثال: أحمد محمود علي" 
+               class="android-input" 
+               required 
+               autofocus />
+      </div>
+
+      <!-- Phone -->
+      <div class="field-box mb-3">
+        <label class="field-label">رقم الهاتف / الواتساب *</label>
+        <input type="tel" 
+               [(ngModel)]="phone" 
+               name="phone"
+               placeholder="010XXXXXXXX" 
+               class="android-input font-mono" 
+               dir="ltr"
+               required />
+      </div>
+
+      <!-- Gender Selection (Big Touch Cards) -->
+      <div class="field-box mb-3">
+        <label class="field-label">النوع *</label>
+        <div class="grid">
+          <div class="col-6">
+            <button type="button" 
+                    class="gender-card" 
+                    [class.gender-selected]="gender === 'Male'"
+                    (click)="gender = 'Male'">
+              <i class="pi pi-user ml-1"></i>
+              <span>ذكر 👦</span>
+            </button>
+          </div>
+          <div class="col-6">
+            <button type="button" 
+                    class="gender-card" 
+                    [class.gender-selected]="gender === 'Female'"
+                    (click)="gender = 'Female'">
+              <i class="pi pi-heart ml-1"></i>
+              <span>أنثى 👧</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Birth Date -->
+      <div class="field-box mb-4">
+        <label class="field-label">تاريخ الميلاد *</label>
+        <input type="date" 
+               [(ngModel)]="birthDate" 
+               name="birthDate"
+               class="android-input" 
+               required />
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-giant btn-primary">
+        <span>التالي: مراجعة البيانات</span>
+        <i class="pi pi-arrow-left mr-2"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- STEP 2: Plain Confirmation -->
+  <div *ngIf="step === 2" class="wizard-card animate-fadein">
+    <div class="flex align-items-center justify-content-between mb-3 pb-2 border-bottom-1 border-100">
+      <button type="button" class="btn-back-step" (click)="step = 1">
+        <i class="pi pi-arrow-right ml-1"></i>
+        <span>تعديل البيانات</span>
+      </button>
+      <span class="font-bold text-xs text-500">تأكيد الحفظ</span>
+    </div>
+
+    <div class="confirmation-box mb-4">
+      <i class="pi pi-info-circle text-2xl text-blue-600 block mb-2"></i>
+      <div class="font-bold text-base text-900 mb-2">هتسجل بطل جديد في الصالة بالبيانات الآتية:</div>
+      <div class="confirm-summary-list">
+        <div class="summary-row">
+          <span class="summary-label">اسم اللاعب:</span>
+          <span class="summary-val font-bold text-900">{{ name }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">رقم الهاتف:</span>
+          <span class="summary-val font-bold font-mono" dir="ltr">{{ phone }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">النوع:</span>
+          <span class="summary-val font-bold">{{ gender === 'Male' ? 'ذكر' : 'أنثى' }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">تاريخ الميلاد:</span>
+          <span class="summary-val font-bold">{{ birthDate }}</span>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-giant btn-success ripple-btn mb-2" (click)="saveMember()">
+      <i class="pi pi-check ml-2"></i>
+      <span>تأكيد وتسجيل البطل</span>
+    </button>
+  </div>
+
+  <!-- STEP 3: Success & Immediate Next Step -->
+  <div *ngIf="step === 3 && createdMember" class="wizard-card text-center p-4 animate-fadein">
+    <div class="success-icon-pod mb-3">
+      <i class="pi pi-check text-4xl"></i>
+    </div>
+    <h2 class="text-xl font-black text-900 m-0 mb-1">تم تسجيل ({{ createdMember.name }}) بنجاح! 🎉</h2>
+    <p class="text-sm text-600 font-bold m-0 mb-4">كود العضوية: {{ createdMember.id }}</p>
+
+    <div class="action-highlight-box mb-4 p-3 border-round bg-blue-50 border-1 border-blue-200">
+      <div class="font-bold text-sm text-blue-900 mb-2">عايز تعمل له اشتراك في باقة الجيم دلوقتي؟</div>
+      <button type="button" 
+              class="btn-giant btn-primary shadow-2"
+              (click)="proceedToSubscription()">
+        <span>كمّل واعمل اشتراك له ⬅️</span>
+        <i class="pi pi-ticket mr-2"></i>
+      </button>
+    </div>
+
+    <div class="flex gap-2 justify-content-center">
+      <button type="button" class="btn-giant btn-secondary text-sm" (click)="reset()">
+        <i class="pi pi-plus ml-1"></i>
+        <span>تسجيل لاعب آخر</span>
+      </button>
+      <a routerLink="/simple" class="btn-giant btn-secondary text-sm text-center text-decoration-none">
+        <i class="pi pi-home ml-1"></i>
+        <span>العودة للرئيسية</span>
+      </a>
+    </div>
+  </div>
+</div>
+

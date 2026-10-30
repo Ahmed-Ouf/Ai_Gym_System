@@ -1,0 +1,176 @@
+<div class="simple-home-container">
+  <!-- Toast Notification -->
+  <div *ngIf="actionMessage" class="simple-toast animate-fadein" [class.toast-success]="actionSuccess" [class.toast-error]="!actionSuccess">
+    <i class="pi text-lg" [ngClass]="actionSuccess ? 'pi-check-circle' : 'pi-exclamation-triangle'"></i>
+    <span class="font-bold text-sm">{{ actionMessage }}</span>
+  </div>
+
+  <!-- Warm Coach Welcome Banner -->
+  <div class="welcome-card mb-4">
+    <div class="flex align-items-center justify-content-between">
+      <div>
+        <h1 class="welcome-title m-0">يا هلا بكابتن الحلواني 👋</h1>
+        <p class="welcome-subtitle m-0 mt-1">اختر العملية اللي عايز تعملها دلوقتي بكل سهولة وبدون تعقيد:</p>
+      </div>
+      <div class="live-status-pill">
+        <span class="pulse-dot"></span>
+        <span class="font-bold text-xs">الصالة شغالة</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE 5 BIG ANDROID ACTION TILES -->
+  <div class="action-grid mb-4">
+    <!-- 1. حضور سريع (Check-in/out) -->
+    <a routerLink="/simple/checkin" class="big-action-card card-emerald">
+      <div class="action-icon-pod pod-emerald">
+        <i class="pi pi-sign-in"></i>
+      </div>
+      <div class="action-info">
+        <span class="action-title">حضور سريع</span>
+        <span class="action-desc">تسجيل دخول أو خروج أي لاعب</span>
+      </div>
+      <i class="pi pi-chevron-left action-arrow"></i>
+    </a>
+
+    <!-- 2. عضو جديد (New Member) -->
+    <a routerLink="/simple/new-member" class="big-action-card card-blue">
+      <div class="action-icon-pod pod-blue">
+        <i class="pi pi-user-plus"></i>
+      </div>
+      <div class="action-info">
+        <span class="action-title">عضو جديد</span>
+        <span class="action-desc">تسجيل بيانات بطل جديد</span>
+      </div>
+      <i class="pi pi-chevron-left action-arrow"></i>
+    </a>
+
+    <!-- 3. اشتراك جديد (New Subscription) -->
+    <a routerLink="/simple/new-subscription" class="big-action-card card-purple">
+      <div class="action-icon-pod pod-purple">
+        <i class="pi pi-ticket"></i>
+      </div>
+      <div class="action-info">
+        <span class="action-title">اشتراك جديد</span>
+        <span class="action-desc">تفعيل باقة شهرية أو سنوية</span>
+      </div>
+      <i class="pi pi-chevron-left action-arrow"></i>
+    </a>
+
+    <!-- 4. تجديد اشتراك (Renew) -->
+    <a routerLink="/simple/renew" class="big-action-card card-amber">
+      <div class="action-icon-pod pod-amber">
+        <i class="pi pi-refresh"></i>
+      </div>
+      <div class="action-info">
+        <span class="action-title">تجديد اشتراك</span>
+        <span class="action-desc">تجديد فوري للباقات المنتهية</span>
+      </div>
+      <i class="pi pi-chevron-left action-arrow"></i>
+    </a>
+
+    <!-- 5. استلام دفعة (Receive Payment) -->
+    <a routerLink="/simple/payment" class="big-action-card card-slate">
+      <div class="action-icon-pod pod-slate">
+        <i class="pi pi-wallet"></i>
+      </div>
+      <div class="action-info">
+        <span class="action-title">استلام دفعة</span>
+        <span class="action-desc">تحصيل اشتراك كاش أو فيزا</span>
+      </div>
+      <i class="pi pi-chevron-left action-arrow"></i>
+    </a>
+  </div>
+
+  <!-- SECONDARY SECTION: In-Gym Now & Expiring Soon -->
+  <div class="grid">
+    <!-- داخل الصالة الآن -->
+    <div class="col-12 md:col-6 mb-3">
+      <div class="section-card h-full">
+        <div class="section-header">
+          <div class="flex align-items-center gap-2">
+            <span class="header-icon icon-teal">
+              <i class="pi pi-users"></i>
+            </span>
+            <div>
+              <h2 class="section-title m-0">داخل الصالة الآن</h2>
+              <span class="section-count font-bold">{{ attendees.length }} متدربين</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="attendees.length === 0" class="empty-state">
+          <i class="pi pi-info-circle text-2xl text-400 block mb-1"></i>
+          <span class="text-xs text-500 font-bold">لا يوجد لاعبين داخل الصالة الرياضية حالياً.</span>
+        </div>
+
+        <div *ngIf="attendees.length > 0" class="attendees-list">
+          <div *ngFor="let a of attendees" class="attendee-item">
+            <div class="flex align-items-center gap-2">
+              <img [src]="a.memberAvatar" class="avatar-sm" />
+              <div>
+                <div class="font-bold text-sm text-900">{{ a.memberName }}</div>
+                <div class="text-xs text-500">
+                  <span class="text-primary font-bold">{{ a.gameNames.join(' + ') }}</span>
+                  <span class="mx-1">•</span>
+                  <span>دخول: {{ a.checkInTime }}</span>
+                </div>
+              </div>
+            </div>
+            <button type="button" 
+                    class="quick-out-btn" 
+                    (click)="quickCheckOut(a.attendanceId, a.memberName)"
+                    title="تسجيل خروج اللاعب">
+              <i class="pi pi-sign-out"></i>
+              <span>خروج</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- اشتراكات تنتهي قريباً -->
+    <div class="col-12 md:col-6 mb-3">
+      <div class="section-card h-full">
+        <div class="section-header">
+          <div class="flex align-items-center gap-2">
+            <span class="header-icon icon-amber">
+              <i class="pi pi-hourglass"></i>
+            </span>
+            <div>
+              <h2 class="section-title m-0">اشتراكات تنتهي قريباً</h2>
+              <span class="section-count font-bold text-amber-700">{{ expiringSubscriptions.length }} بحاجة للتجديد</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="expiringSubscriptions.length === 0" class="empty-state">
+          <i class="pi pi-check-circle text-2xl text-green-500 block mb-1"></i>
+          <span class="text-xs text-500 font-bold">كل الاشتراكات سارية ولا يوجد انتهاء خلال 7 أيام! 🎉</span>
+        </div>
+
+        <div *ngIf="expiringSubscriptions.length > 0" class="expiring-list">
+          <div *ngFor="let item of expiringSubscriptions" class="expiring-item">
+            <div class="flex align-items-center gap-2">
+              <img [src]="item.member.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + item.member.id" class="avatar-sm" />
+              <div>
+                <div class="font-bold text-sm text-900">{{ item.member.name }}</div>
+                <div class="text-xs text-amber-800 font-bold">
+                  {{ item.game.name }} • متبقي {{ item.daysLeft }} أيام
+                </div>
+              </div>
+            </div>
+            <button type="button" 
+                    class="renew-now-btn" 
+                    (click)="goToRenew(item.member.id)"
+                    title="تجديد الاشتراك فوراً">
+              <span>تجديد الآن</span>
+              <i class="pi pi-refresh"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

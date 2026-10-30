@@ -1,7 +1,8 @@
 import { Component, Output, EventEmitter, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { GymDataService } from '../../services/gym-data.service';
+import { UiModeService } from '../../services/ui-mode.service';
 
 @Component({
   selector: 'app-navbar',
@@ -20,7 +21,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showProfileMenu: boolean = false;
   expiringCount: number = 0;
 
-  constructor(public gymService: GymDataService) {}
+  constructor(
+    public gymService: GymDataService,
+    public uiModeService: UiModeService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.updateTime();
@@ -63,5 +68,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   toggleProfileDropdown(): void {
     this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  switchToSimpleMode(): void {
+    this.showProfileMenu = false;
+    this.uiModeService.setMode('simple');
+    this.router.navigate(['/simple']);
   }
 }

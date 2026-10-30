@@ -138,6 +138,7 @@ Enterprise-level control and data safety:
 | Smart Guardrail | Problem Solved | Technical Implementation |
 | :--- | :--- | :--- |
 | **Searchable Dual-Filter Dropdown** | Frustrating endless scrolling in standard select menus as membership scales. | PrimeNG `p-dropdown` with `[filter]="true"` and `filterBy="name,phone"` allowing instant retrieval by name or digits. |
+| **Simple Mode (Android-Style UI)** | Non-technical gym coaches feeling overwhelmed by complex desktop dashboards. | Alternative low-anxiety interface featuring 5 prominent action tiles and 3-step guided wizards with plain-language confirmations. |
 | **Anti-Duplicate Check-in** | Receptionist accidentally checking in the same member twice during their workout. | Live status validator verifies whether the member's latest check-in record has `checkOut === null`. Disables duplicate entry with warning. |
 | **Subscription Overlap Guard** | Double-charging or creating conflicting date ranges for the same sport. | Automated date-overlap collision algorithms inspect active subscriptions before allowing new creations. |
 | **Zero-Data-Loss Persistence** | Power outages, browser crashes, or accidental reloads losing front-desk data. | Synchronous reactive persistence pipeline syncing all state changes to structured `LocalStorage` with schema backups. |

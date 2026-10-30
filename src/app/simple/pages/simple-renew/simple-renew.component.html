@@ -1,0 +1,223 @@
+<div class="wizard-container">
+  <!-- Top Navigation & Stepper -->
+  <div class="wizard-header mb-3">
+    <a routerLink="/simple" class="back-link">
+      <i class="pi pi-arrow-right"></i>
+      <span>الرئيسية</span>
+    </a>
+    <div class="step-indicator font-bold">
+      <span *ngIf="step === 1">الخطوة 1 من 3: اختيار اللاعب</span>
+      <span *ngIf="step === 2">الخطوة 2 من 3: تفاصيل التجديد</span>
+      <span *ngIf="step === 3">الخطوة 3 من 3: تأكيد التجديد</span>
+      <span *ngIf="step === 4">تم التجديد بنجاح ✅</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: Urgent Expiring List First (No need to search) -->
+  <div *ngIf="step === 1" class="wizard-card animate-fadein">
+    <div class="wizard-card-header">
+      <h1 class="wizard-title m-0">تجديد اشتراك لاعب</h1>
+      <p class="wizard-subtitle m-0 mt-1">دي قائمة بالاشتراكات المنتهية أو اللي قربت تنتهي اضغط "تجديد الآن" مباشرة:</p>
+    </div>
+
+    <!-- Quick Filter Box -->
+    <div class="search-input-wrapper mb-3">
+      <i class="pi pi-search search-icon"></i>
+      <input type="text" 
+             [(ngModel)]="searchQuery" 
+             placeholder="ابحث بالاسم أو الهاتف في قائمة التجديد..." 
+             class="big-search-box" />
+    </div>
+
+    <div class="candidates-stack">
+      <div *ngFor="let c of filteredCandidates" 
+           (click)="pickCandidate(c)"
+           class="candidate-card ripple-btn"
+           [class.card-urgent]="c.isExpired">
+        <img [src]="c.member.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + c.member.id" class="candidate-avatar" />
+        <div class="candidate-info">
+          <div class="candidate-name">{{ c.member.name }}</div>
+          <div class="candidate-sub text-xs">
+            <span>{{ c.game.name }}</span>
+            <span class="mx-1">•</span>
+            <span *ngIf="c.isExpired" class="badge-expired font-bold">منتهي منذ {{ -c.daysRemaining }} يوم</span>
+            <span *ngIf="!c.isExpired" class="badge-warning font-bold">ينتهي خلال {{ c.daysRemaining }} أيام</span>
+          </div>
+        </div>
+        <button type="button" class="btn-renew-tap">
+          <span>تجديد الآن</span>
+          <i class="pi pi-refresh"></i>
+        </button>
+      </div>
+
+      <div *ngIf="filteredCandidates.length === 0" class="p-4 text-center">
+        <i class="pi pi-check-circle text-3xl text-green-500 block mb-2"></i>
+        <div class="font-bold text-sm text-700">لا توجد اشتراكات منتهية أو بحاجة لتجديد عاجل الآن!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Pre-filled Renewal Details -->
+  <div *ngIf="step === 2 && selectedMember && previousSubscription && selectedGame" class="wizard-card animate-fadein">
+    <div class="flex align-items-center justify-content-between mb-3 pb-2 border-bottom-1 border-100">
+      <button type="button" class="btn-back-step" (click)="step = 1">
+        <i class="pi pi-arrow-right ml-1"></i>
+        <span>تغيير اللاعب</span>
+      </button>
+      <span class="font-bold text-xs text-500">بيانات التجديد</span>
+    </div>
+
+    <!-- Member Identity Banner -->
+    <div class="selected-member-banner mb-3">
+      <img [src]="selectedMember.avatar || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + selectedMember.id" class="big-avatar" />
+      <div>
+        <h2 class="m-0 font-bold text-base text-900">{{ selectedMember.name }}</h2>
+        <span class="text-xs text-500 font-mono" dir="ltr">{{ selectedMember.phone }}</span>
+      </div>
+    </div>
+
+    <!-- Pre-filled Sport Box (Read-only, or easy switch) -->
+    <div class="prefilled-sport-box mb-3 p-3 border-round bg-blue-50 border-1 border-blue-200">
+      <div class="flex align-items-center justify-content-between">
+        <div>
+          <span class="text-xs text-blue-700 font-bold block">النشاط الرياضي الحالي:</span>
+          <span class="font-bold text-base text-blue-900">{{ selectedGame.name }}</span>
+        </div>
+        <i class="pi pi-bolt text-2xl text-blue-500"></i>
+      </div>
+    </div>
+
+    <!-- Duration Selection -->
+    <div class="mb-3">
+      <label class="block font-bold text-xs text-700 mb-2">مدة التجديد:</label>
+      <div class="grid">
+        <div class="col-4">
+          <button type="button" 
+                  class="plan-tile" 
+                  [class.plan-selected]="planType === 'Monthly'"
+                  (click)="onPlanChange('Monthly')">
+            <span class="plan-name">شهر جديد</span>
+            <span class="plan-sub">شهري</span>
+          </button>
+        </div>
+        <div class="col-4">
+          <button type="button" 
+                  class="plan-tile" 
+                  [class.plan-selected]="planType === 'Quarterly'"
+                  (click)="onPlanChange('Quarterly')">
+            <span class="plan-name">3 أشهر</span>
+            <span class="plan-sub">خصم 10%</span>
+          </button>
+        </div>
+        <div class="col-4">
+          <button type="button" 
+                  class="plan-tile" 
+                  [class.plan-selected]="planType === 'Yearly'"
+                  (click)="onPlanChange('Yearly')">
+            <span class="plan-name">سنة كاملة</span>
+            <span class="plan-sub">خصم 25%</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Calculated Dates -->
+    <div class="calc-summary-card mb-4">
+      <div class="grid">
+        <div class="col-6">
+          <span class="calc-label">يبدأ التجديد من:</span>
+          <input type="date" [(ngModel)]="newStartDate" (change)="recalculateDates()" class="calc-date-input" />
+        </div>
+        <div class="col-6">
+          <span class="calc-label">ينتهي في:</span>
+          <div class="calc-end-date font-bold text-green-800">{{ newEndDate }}</div>
+        </div>
+      </div>
+      <div class="price-bar mt-2 pt-2 border-top-1 border-green-200 flex justify-content-between align-items-center">
+        <span class="font-bold text-sm text-800">قيمة التجديد المطلوبة:</span>
+        <span class="price-tag font-black text-xl text-primary">{{ renewPrice }} ج.م</span>
+      </div>
+    </div>
+
+    <!-- Next Button -->
+    <button type="button" class="btn-giant btn-primary" (click)="goToConfirmation()">
+      <span>التالي: مراجعة وتأكيد</span>
+      <i class="pi pi-arrow-left mr-2"></i>
+    </button>
+  </div>
+
+  <!-- STEP 3: Plain Confirmation -->
+  <div *ngIf="step === 3 && selectedMember && selectedGame" class="wizard-card animate-fadein">
+    <div class="flex align-items-center justify-content-between mb-3 pb-2 border-bottom-1 border-100">
+      <button type="button" class="btn-back-step" (click)="step = 2">
+        <i class="pi pi-arrow-right ml-1"></i>
+        <span>تعديل المدة</span>
+      </button>
+      <span class="font-bold text-xs text-500">تأكيد نهائي</span>
+    </div>
+
+    <div class="confirmation-box mb-4">
+      <i class="pi pi-refresh text-2xl text-amber-600 block mb-2"></i>
+      <div class="font-bold text-base text-900 mb-2">هتجدد اشتراك البطل:</div>
+      <div class="confirm-summary-list">
+        <div class="summary-row">
+          <span class="summary-label">اسم اللاعب:</span>
+          <span class="summary-val font-bold text-900">{{ selectedMember.name }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">النشاط الرياضي:</span>
+          <span class="summary-val font-bold text-primary">{{ selectedGame.name }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">المدة الجديدة:</span>
+          <span class="summary-val font-bold">{{ planType === 'Monthly' ? 'شهر واحد' : (planType === 'Quarterly' ? '3 أشهر' : 'سنة كاملة') }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">الفترة:</span>
+          <span class="summary-val font-bold font-tabular text-xs">من {{ newStartDate }} حتى {{ newEndDate }}</span>
+        </div>
+        <div class="summary-row bg-amber-50 p-2 border-round">
+          <span class="summary-label font-bold text-amber-950">المبلغ المطلوب سداده:</span>
+          <span class="summary-val font-black text-xl text-primary">{{ renewPrice }} ج.م</span>
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-giant btn-success mb-2" (click)="saveRenewal()">
+      <i class="pi pi-check ml-2"></i>
+      <span>تأكيد التجديد الآن</span>
+    </button>
+  </div>
+
+  <!-- STEP 4: Success & Payment CTA -->
+  <div *ngIf="step === 4 && selectedMember && createdSubscription && selectedGame" class="wizard-card text-center p-4 animate-fadein">
+    <div class="success-icon-pod mb-3">
+      <i class="pi pi-check text-4xl"></i>
+    </div>
+    <h2 class="text-xl font-black text-900 m-0 mb-1">تم تجديد اشتراك ({{ selectedMember.name }}) بنجاح! ✅</h2>
+    <p class="text-sm text-600 font-bold m-0 mb-4">{{ selectedGame.name }} • ممدد حتى {{ createdSubscription.endDate }}</p>
+
+    <!-- Payment CTA -->
+    <div class="action-highlight-box mb-4 p-3 border-round bg-green-50 border-1 border-green-200">
+      <div class="font-bold text-sm text-green-950 mb-2">استلمت قيمة التجديد ({{ renewPrice }} ج.م) دلوقتي؟</div>
+      <button type="button" 
+              class="btn-giant btn-success shadow-2"
+              (click)="proceedToPayment()">
+        <span>استلم الدفعة وسجّل الإيصال 💵</span>
+        <i class="pi pi-wallet mr-2"></i>
+      </button>
+    </div>
+
+    <div class="flex gap-2 justify-content-center">
+      <button type="button" class="btn-giant btn-secondary text-sm" (click)="reset()">
+        <i class="pi pi-refresh ml-1"></i>
+        <span>تجديد لاعب آخر</span>
+      </button>
+      <a routerLink="/simple" class="btn-giant btn-secondary text-sm text-center text-decoration-none">
+        <i class="pi pi-home ml-1"></i>
+        <span>العودة للرئيسية</span>
+      </a>
+    </div>
+  </div>
+</div>
+

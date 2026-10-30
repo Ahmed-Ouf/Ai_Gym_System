@@ -1,0 +1,62 @@
+<div class="simple-app-wrapper">
+  <!-- Android Style Top App Bar -->
+  <header class="simple-top-bar">
+    <div class="bar-start">
+      <a routerLink="/simple" class="brand-link" title="الرئيسية">
+        <div class="gym-badge-icon">
+          <i class="pi pi-bolt"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title font-black">جيم الحلواني</span>
+          <span class="brand-mode-pill">الوضع المبسط</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="bar-end">
+      <!-- Live Clock -->
+      <div class="simple-clock hidden sm:flex">
+        <i class="pi pi-clock ml-1"></i>
+        <span>{{ currentTime }}</span>
+      </div>
+
+      <!-- User Menu -->
+      <div class="profile-section">
+        <button type="button" class="coach-avatar-btn" (click)="toggleProfileMenu()" title="حساب الكابتن">
+          <div class="coach-avatar">ح</div>
+          <span class="coach-name hidden md:inline">كابتن الحلواني</span>
+          <i class="pi pi-chevron-down mr-1"></i>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="simple-dropdown" *ngIf="showProfileMenu">
+          <div class="dropdown-header">
+            <div class="avatar-lg">ح</div>
+            <div>
+              <div class="font-bold text-sm text-900">كابتن أحمد الحلواني</div>
+              <div class="text-xs text-500">الوضع المبسط مفعل</div>
+            </div>
+          </div>
+          <hr class="dropdown-divider" />
+          <button type="button" class="switch-mode-btn" (click)="switchToStandardMode()">
+            <div class="icon-pod">
+              <i class="pi pi-desktop"></i>
+            </div>
+            <div class="text-right flex-1">
+              <div class="font-bold text-sm text-900">التبديل إلى الوضع العادي</div>
+              <div class="text-xs text-500">لوحة التحكم الكاملة والتقارير</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="simple-main-content">
+    <div class="simple-content-canvas">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
+

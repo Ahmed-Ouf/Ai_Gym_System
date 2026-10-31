@@ -6,12 +6,16 @@
 
   <!-- Gym Brand Area -->
   <div class="brand-section">
-    <div class="logo-sphere">
-      <i class="pi pi-bolt logo-icon"></i>
+    <!-- Collapsed View: Just the Emblem badge -->
+    <div class="logo-badge-collapsed" *ngIf="collapsed" title="جيم الحلواني - EL-HALAWANY GYM">
+      <img src="assets/logo-icon.png" alt="جيم الحلواني" class="app-emblem-img" />
     </div>
-    <div class="brand-details" *ngIf="!collapsed">
-      <span class="brand-name">جيم الحلواني</span>
-      <span class="brand-tagline text-xs font-semibold">EL-HALAWANY GYM</span>
+
+    <!-- Expanded View: Big and clear full logo card -->
+    <div class="brand-expanded-wrapper" *ngIf="!collapsed">
+      <div class="logo-card" title="جيم الحلواني - EL-HALAWANY GYM">
+        <img src="assets/logo.png" alt="جيم الحلواني - EL-HALAWANY GYM" class="app-full-logo" />
+      </div>
     </div>
   </div>
 

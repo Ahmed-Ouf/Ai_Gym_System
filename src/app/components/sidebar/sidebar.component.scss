@@ -24,9 +24,8 @@
       justify-content: center;
     }
 
-    .logo-sphere {
-      margin-left: 0;
-      margin-right: 0;
+    .logo-badge-collapsed {
+      margin: 0 auto;
     }
 
     .nav-item {
@@ -78,51 +77,68 @@
 
 /* Brand Logo Section */
 .brand-section {
-  padding: 1.5rem 1.75rem;
-  display: flex;
-  align-items: center;
-  height: 75px;
-  transition: all 0.3s ease;
-}
-
-.logo-sphere {
-  width: 42px;
-  height: 42px;
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  border-radius: 12px;
+  padding: 1.25rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-  margin-left: 14px; /* RTL margin left */
-  margin-right: 0;
-  flex-shrink: 0;
-  animation: logo-pulse 3s infinite ease-in-out;
+  min-height: 92px;
+  transition: all 0.3s ease;
 }
 
-.logo-icon {
-  color: #ffffff;
-  font-size: 1.3rem;
-}
-
-.brand-details {
+.brand-expanded-wrapper {
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.brand-name {
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 1.2rem;
-  letter-spacing: normal;
-  line-height: 1.2;
+.logo-card {
+  width: 100%;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 14px;
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  transition: all 0.25s ease;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3), 0 0 0 1.5px rgba(56, 189, 248, 0.5);
+    transform: translateY(-1px);
+  }
+
+  .app-full-logo {
+    width: 100%;
+    max-height: 52px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.06));
+  }
 }
 
-.brand-tagline {
-  color: #38bdf8;
-  letter-spacing: 0.05em;
-  font-size: 0.7rem;
-  font-weight: 700;
+.logo-badge-collapsed {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  padding: 5px;
+  transition: all 0.25s ease;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3), 0 0 0 1.5px rgba(56, 189, 248, 0.5);
+    transform: scale(1.04);
+  }
+
+  .app-emblem-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
 }
 
 .nav-divider {
